@@ -1,4 +1,16 @@
-# Prerequisites
+# Git ignore propio
+
+*.code-workspace
+**/obj
+**/logs
+
+consola/consola
+memoria/memoria
+cpu/cpu
+kernel/kernel
+
+
+# Git ignore de la catedra
 *.d
 
 # Object files
