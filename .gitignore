@@ -1,8 +1,8 @@
 # Git ignore propio
 
 *.code-workspace
-**/obj
-**/logs
+**/obj/*.o
+**/logs/*.log
 
 consola/consola
 memoria/memoria
