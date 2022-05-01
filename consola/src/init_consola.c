@@ -1,7 +1,7 @@
 #include "init_consola.h"
 
-void cerrar_programa(t_config_consola* cfg, t_log* main_log) {
-    log_destroy(main_log);
+void cerrar_programa(t_config_consola* cfg, t_log* mainLog) {
+    log_destroy(mainLog);
 
     free(cfg->IP_KERNEL);
     free(cfg);
@@ -9,11 +9,11 @@ void cerrar_programa(t_config_consola* cfg, t_log* main_log) {
     rl_clear_history();
 }
 
-uint8_t generar_conexiones(int* kernel_fd, t_config_consola* cfg,t_log* main_log) {
+uint8_t generar_conexiones(int* kernel_fd, t_config_consola* cfg,t_log* mainLog) {
     char* port_kernel = string_itoa(cfg->PUERTO_KERNEL);
 
     *kernel_fd = crear_conexion(
-            main_log,
+            mainLog,
             "KERNEL",
             cfg->IP_KERNEL,
             port_kernel
@@ -24,11 +24,11 @@ uint8_t generar_conexiones(int* kernel_fd, t_config_consola* cfg,t_log* main_log
     return *kernel_fd != 0;
 }
 
-uint8_t cargar_configuracion(t_config_consola* config, t_log* main_log) {
+uint8_t cargar_configuracion(t_config_consola* config, t_log* mainLog) {
     t_config* cfg = config_create("./cfg/consola.config");
 
     if(cfg == NULL) {
-        log_error(main_log, "No se encontro consola.config");
+        log_error(mainLog, "No se encontro consola.config");
         return 0;
     }
 
@@ -38,10 +38,8 @@ uint8_t cargar_configuracion(t_config_consola* config, t_log* main_log) {
         NULL
     };
 
-    // Falta alguna propiedad?
-    //TODO agregar este metodo a utils de shared
     if(!config_has_all_properties(cfg, properties)) {
-        log_error(main_log, "Propiedades faltantes en el archivo de configuracion");
+        log_error(mainLog, "Propiedades faltantes en el archivo de configuracion");
         config_destroy(cfg);
         return 0;
     }
@@ -49,7 +47,7 @@ uint8_t cargar_configuracion(t_config_consola* config, t_log* main_log) {
     config->IP_KERNEL = strdup(config_get_string_value(cfg, "IP_KERNEL"));
     config->PUERTO_KERNEL = config_get_int_value(cfg, "PUERTO_KERNEL");
 
-    log_info(main_log, "Archivo de configuracion cargado correctamente");
+    log_info(mainLog, "Archivo de configuracion cargado correctamente");
 
     config_destroy(cfg);
 

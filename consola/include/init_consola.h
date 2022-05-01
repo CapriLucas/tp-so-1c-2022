@@ -8,10 +8,10 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 
-#include "sockets.h"
 #include "config.h"
 
 //Shared
+#include "sockets.h"
 #include "shared_utils.h"
 
 
