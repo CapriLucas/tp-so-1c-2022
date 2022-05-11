@@ -1,8 +1,9 @@
 #include "init_consola.h"
 
-void cerrar_programa(t_config_consola* cfg, t_log* mainLog) {
+void cerrar_programa(t_config_consola* cfg, t_log* mainLog, int* kernel_fd) {
     log_destroy(mainLog);
 
+    liberar_conexion(kernel_fd);
     free(cfg->IP_KERNEL);
     free(cfg);
 

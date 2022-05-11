@@ -15,9 +15,9 @@ int main(){
     initializeProcess();
 
     int kernelFd;
-    if(!generar_conexiones(kernelFd, mainConfig, mainLog)){
-        cerrar_programa(mainConfig, mainLog);
+    if(!generar_conexiones(&kernelFd, mainConfig, mainLog)){
+        cerrar_programa(mainConfig, mainLog, &kernelFd);
         return EXIT_FAILURE;
     }
-    cerrar_programa(mainConfig, mainLog);
+    cerrar_programa(mainConfig, mainLog, &kernelFd);
 }
