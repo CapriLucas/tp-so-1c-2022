@@ -2,7 +2,9 @@
 #define CONSOLA_H
 
 #include <stdio.h>
+#include <commons/string.h>
 #include <commons/log.h>
+#include <commons/config.h>
 #include <stdbool.h>
 #include "shared_utils.h"
 
