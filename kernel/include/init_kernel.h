@@ -15,7 +15,9 @@
 #include "shared_utils.h"
 
 
-uint8_t cargar_configuracion(t_config_consola*, t_log*);
-uint8_t generar_conexiones(int*, t_config_consola*, t_log*);
-void cerrar_programa(t_config_consola*, t_log*,int*);
+uint8_t cargar_configuracion(t_config_kernel*, t_log*);
+uint8_t generar_conexiones(int*, t_config_kernel*, t_log*);
+void cerrar_programa(t_config_kernel*, t_log*, int* server_fd);
+bool crear_servidor(t_config_kernel* cfg, t_log* logger, int* fd, char* name);
+
 #endif

@@ -1,5 +1,30 @@
 #include "init_consola.h"
 
+void cerrar_programa(t_config_consola* cfg, t_log* mainLog, int* kernel_fd) {
+    log_destroy(mainLog);
+
+    liberar_conexion(kernel_fd);
+    free(cfg->IP_KERNEL);
+    free(cfg);
+
+    rl_clear_history();
+}
+
+uint8_t generar_conexiones(int* kernel_fd, t_config_consola* cfg,t_log* mainLog) {
+    char* port_kernel = string_itoa(cfg->PUERTO_KERNEL);
+
+    *kernel_fd = crear_conexion(
+            mainLog,
+            "KERNEL",
+            cfg->IP_KERNEL,
+            port_kernel
+    );
+
+    free(port_kernel);
+
+    return *kernel_fd != 0;
+}
+
 uint8_t cargar_configuracion(t_config_consola* config, t_log* mainLog) {
     t_config* cfg = config_create("./cfg/consola.config");
 
@@ -28,13 +53,4 @@ uint8_t cargar_configuracion(t_config_consola* config, t_log* mainLog) {
     config_destroy(cfg);
 
     return 1;
-}
-
-void cerrar_programa(t_config_consola* cfg, t_log* mainLog) {
-    log_destroy(mainLog);
-
-    free(cfg->IP_KERNEL);
-    free(cfg);
-
-    rl_clear_history();
 }

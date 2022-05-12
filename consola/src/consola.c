@@ -20,5 +20,10 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
-    cerrar_programa(mainConfig, mainLog);
+    int kernelFd;
+    if(!generar_conexiones(&kernelFd, mainConfig, mainLog)){
+        cerrar_programa(mainConfig, mainLog, &kernelFd);
+        return EXIT_FAILURE;
+    }
+    cerrar_programa(mainConfig, mainLog, &kernelFd);
 }
