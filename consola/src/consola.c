@@ -13,9 +13,9 @@ static void initializeProcess(){
 
 int main(){
     initializeProcess();
-    char* text = leer_archivo_completo("./cfg/pseudocodigo"); //TODO este path viene como parte del argc y argv
+    char* texto_crudo = leer_archivo_completo("./cfg/pseudocodigo"); //TODO este path viene como parte del argc y argv
 
-    if(text == NULL){
+    if(texto_crudo == NULL){
         log_error(mainLog,"Fallo al leer el pseudocodigo");
         exit(EXIT_FAILURE);
     }
@@ -25,5 +25,8 @@ int main(){
         cerrar_programa(mainConfig, mainLog, &kernelFd);
         return EXIT_FAILURE;
     }
+
+    enviarInstrucciones(texto_crudo, kernelFd);
+
     cerrar_programa(mainConfig, mainLog, &kernelFd);
 }
