@@ -20,7 +20,7 @@
         {
             "label": "consola Valgrind",
             "type": "shell",
-            "command": "./vexec.sh ${input:path} ${input:memory_size}",
+            "command": "./vexec.sh ./cfg/pseudocodigo 8",
             "presentation": {
                 "focus": true,
             }
