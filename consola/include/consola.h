@@ -5,8 +5,17 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <commons/string.h>
 #include <commons/log.h>
+#include <commons/config.h>
 #include <stdbool.h>
+
+#include "config.h"
+#include "codigo.h"
+#include "init_consola.h"
+
+//Shared
+#include "protocolo.h"
 #include "shared_utils.h"
 #include <dirent.h>
 #include <errno.h>
