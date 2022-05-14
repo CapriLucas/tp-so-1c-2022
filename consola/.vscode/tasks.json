@@ -12,7 +12,7 @@
         {
             "label": "consola Normal",
             "type": "shell",
-            "command": "./exec.sh",
+            "command": "./exec.sh ./cfg/pseudocodigo 8",
             "presentation": {
                 "focus": true,
             }
@@ -20,7 +20,7 @@
         {
             "label": "consola Valgrind",
             "type": "shell",
-            "command": "./vexec.sh",
+            "command": "./vexec.sh ${input:path} ${input:memory_size}",
             "presentation": {
                 "focus": true,
             }

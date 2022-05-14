@@ -1,7 +1,7 @@
 #include "consola.h"
 
 
-int console_cmd(t_console_cmd* cmd, char* argv1, char* argv2, t_log* logger) {
+uint8_t console_cmd(t_console_cmd* cmd, char* argv1, char* argv2, t_log* logger) {
 
     // Test path: argv[1]
     cmd->PATH = strdup(argv1);
@@ -32,10 +32,11 @@ int console_cmd(t_console_cmd* cmd, char* argv1, char* argv2, t_log* logger) {
 }
 
 
+
 int main(int argc, char** argv) {
 
     // Test argc 
-    if (argc < 3) {
+    if (argc != 3) {
         printf("Usage: console <path> <memory size>\n");        
         return EXIT_FAILURE;
     }
