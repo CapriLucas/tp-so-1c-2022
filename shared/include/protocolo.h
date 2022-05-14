@@ -11,24 +11,46 @@
 #include <stdlib.h>
 #include <commons/collections/list.h>
 #include <commons/log.h>
+#include <commons/config.h>
+#include <commons/string.h>
+#include <commons/log.h>
+
+//Shared
+#include "shared_utils.h"
 
 typedef enum {
-    DEBUG               = 69, //TODO ver esto
+	ENVIAR_PSEUDO_CODIGO,
+	DEBUG_OP_CODE
 } op_code;
 
-// / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / //
-//////  UN SERIALIZAR Y UN DESERIALIZAR POR CADA MENSAJE   //////
-// / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / //
-////// Algunos no necesitan enviar nada en el payload,     //////
-////// asi que esos no tienen un serializar/deserializar   //////
-////// por implementar. Otros comparten el deserializar    //////
-////// con algun otro mensaje.                             //////
-// / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / //
+typedef struct {
+	uint32_t size;
+	void* stream;
+} t_buffer;
 
-//////////// MENSAJES /////////////
+typedef struct {
+	op_code codigo_operacion;
+	t_buffer* buffer;
+} t_paquete;
 
+typedef enum {
+	NO_OP,
+	I_O,
+	READ,
+	COPY,
+	WRITE,
+	EXIT
+} instruccion_cod;
 
-// Generico
-bool send_codigo_op();
+typedef struct {
+	instruccion_cod codigo_instruccion;
+	uint32_t parametro;
+} t_instruccion;
+
+t_paquete* crear_paquete(op_code codigo_operacion);
+void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);
+void enviar_paquete(t_paquete* paquete, int socket_cliente);
+void eliminar_paquete(t_paquete* paquete);
+bool send_codigo_op(int fd, op_code cop);
 
 #endif
