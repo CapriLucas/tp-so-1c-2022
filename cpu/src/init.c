@@ -1,9 +1,9 @@
 #include "init.h"
 
-void cerrar_programa(t_config_CPU* cfg, t_log* mainLog, int* kernel_fd) {
+void cerrar_programa(t_config_CPU* cfg, t_log* mainLog, int* cpuFd) {
     log_destroy(mainLog);
 
-    liberar_conexion(kernel_fd);
+    liberar_conexion(cpuFd);
     free(cfg->REEMPLAZO_TLB);
     free(cfg->IP_MEMORIA);
     free(cfg);

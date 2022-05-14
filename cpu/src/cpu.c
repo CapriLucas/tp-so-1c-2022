@@ -26,14 +26,44 @@ int main(){
     printf("PUERTO_ESCUCHA_DISPATCH: %d\n", mainConfig->PUERTO_ESCUCHA_DISPATCH);
     printf("PUERTO_ESCUCHA_INTERRUPT: %d\n", mainConfig->PUERTO_ESCUCHA_INTERRUPT);
 
+    int cpuFd;
+    int memoriaFd;
     int kernelFd;
-/* 
-    if(!generar_conexiones(&kernelFd, mainConfig, mainLog)){
+
+    // Crear conexión con Memoria   
+    memoriaFd = crear_conexion (
+        mainLog, 
+        "MEMORIA", 
+        mainConfig->IP_MEMORIA, 
+        "8002" // mainConfig->PUERTO_MEMORIA
+    );
+
+    if (!memoriaFd) {    
+        cerrar_programa(mainConfig, mainLog, &memoriaFd);
+        return EXIT_FAILURE;
+    }
+
+    memoriaFd = iniciar_servidor (
+        mainLog,
+        "CPU",
+        mainConfig->IP_MEMORIA, 
+        "8002" // mainConfig->PUERTO_MEMORIA
+    );
+
+/*     
+    // Esperar conexión de Kernel
+    kernelFd = esperar_cliente (
+        mainLog, 
+        "KERNEL", 
+        cpuFd
+    );
+
+    if (!kernelFd) {    
         cerrar_programa(mainConfig, mainLog, &kernelFd);
         return EXIT_FAILURE;
     }
 */
 
-    cerrar_programa(mainConfig, mainLog, &kernelFd);
+    cerrar_programa(mainConfig, mainLog, &cpuFd);
 
 }

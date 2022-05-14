@@ -28,15 +28,32 @@ int main(){
     printf("RETARDO_SWAP: %d\n", mainConfig->RETARDO_SWAP);
     printf("PATH_SWAP: %s\n", mainConfig->PATH_SWAP);
 
-  
-    int kernelFd;
-/* 
-    if(!generar_conexiones(&kernelFd, mainConfig, mainLog)){
-        cerrar_programa(mainConfig, mainLog, &kernelFd);
-        return EXIT_FAILURE;
-    }
-*/
 
-    cerrar_programa(mainConfig, mainLog, &kernelFd);
+    int memoriaFd;
+    int kernelFd;
+    int cpuFd;
+
+    memoriaFd = iniciar_servidor (
+        mainLog,
+        "MEMORIA",
+        "127.0.0.1", // mainConfig->IP_MEMORIA, 
+        "8002"      // mainConfig->PUERTO_ESCUCHA
+    );
+
+    // Esperar conexión de Kernel
+    kernelFd = esperar_cliente (
+        mainLog, 
+        "KERNEL", 
+        memoriaFd
+    );
+
+    // Esperar conexión de CPU
+    cpuFd = esperar_cliente (
+        mainLog, 
+        "KERNEL", 
+        memoriaFd
+    );
+
+    cerrar_programa(mainConfig, mainLog, &memoriaFd);
 
 }

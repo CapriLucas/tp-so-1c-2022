@@ -1,9 +1,9 @@
 #include "init.h"
 
-void cerrar_programa(t_config_Memoria* cfg, t_log* mainLog, int* kernel_fd) {
+void cerrar_programa(t_config_Memoria* cfg, t_log* mainLog, int* memoriaFd) {
     log_destroy(mainLog);
 
-    liberar_conexion(kernel_fd);
+    liberar_conexion(memoriaFd);
     free(cfg->ALGORITMO_REEMPLAZO);
     free(cfg->PATH_SWAP);
     free(cfg);
