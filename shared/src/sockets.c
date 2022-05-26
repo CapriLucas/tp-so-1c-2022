@@ -16,11 +16,16 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
 
     bool conecto = false;
 
-    // Itera por cada addrinfo devuelto
+        // Itera por cada addrinfo devuelto
     for (struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
         socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (socket_servidor == -1) // fallo de crear socket
             continue;
+
+        /*  Evita que el socket quede en un limbo y se pueda reutilizar en forma inmediata, 
+            sin necesidad de esperar a que el S.O. lo libere. */
+        int active = 1;
+        setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &active, sizeof(active));
 
         if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
             // Si entra aca fallo el bind
@@ -45,6 +50,31 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
     freeaddrinfo(servinfo); //free
 
     return socket_servidor;
+}
+
+int server_init (t_log* logger, const char* name, char* port) {
+
+    struct sockaddr_in serverAddress;
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(8001);
+
+    int serverFd = socket(AF_INET, SOCK_STREAM, 0);
+
+    int active = 1;
+    setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &active, sizeof(active));
+
+    if (bind(serverFd, (void*) &serverAddress, sizeof(serverAddress)) != 0 ) {
+        perror("Bind error.");
+        return 1;
+    }
+
+    printf("Listening on %s ...\n", port);
+    listen(serverFd, SOMAXCONN);
+
+    for(;;);
+
+    return 0;
 }
 
 // ESPERAR CONEXION DE CLIENTE EN UN SERVER ABIERTO

@@ -1,9 +1,14 @@
 #include "init.h"
 
-void cerrar_programa(t_config_CPU* cfg, t_log* mainLog, int* cpuFd) {
+void cerrar_programa(t_config_CPU* cfg, t_log* mainLog, int* cpuDispatchFd, int* cpuInterruptFd) {
     log_destroy(mainLog);
 
-    liberar_conexion(cpuFd);
+    if (cpuDispatchFd) {    // NOT NULL
+        liberar_conexion(cpuDispatchFd);
+    }
+    if (cpuInterruptFd) {   // NOT NULL
+        liberar_conexion(cpuInterruptFd);
+    }   
     free(cfg->REEMPLAZO_TLB);
     free(cfg->IP_MEMORIA);
     free(cfg);
