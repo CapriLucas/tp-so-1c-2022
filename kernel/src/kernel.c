@@ -38,7 +38,7 @@ int main(){
     memoriaFd = crear_conexion (
         mainLog, 
         "MEMORIA", 
-        config->IP_MEMORIA, 
+        mainConfig->IP_MEMORIA, 
         "8002" // mainConfig->PUERTO_MEMORIA
     );
 
@@ -54,6 +54,9 @@ int main(){
         mainConfig->IP_CPU, 
         "8001"  // config->PUERTO_CPU_DISPATCH 
     );
+
+    // Test send dispatch msg to CPU -- Borrar
+    send(kernelDispatchFd, "DISPATCH MSG", 13, 0);
      
     // Crear conexión con CPU para mensajes de interrupciones
     kernelInterruptFd = crear_conexion (
@@ -62,8 +65,14 @@ int main(){
         mainConfig->IP_CPU, 
         "8005"  // config->PUERTO_ESCUCHA_INTERRUPT
     );
-    
 
+    // Test send interrupt msg to CPU -- Borrar
+    send(kernelInterruptFd, "INTERRUPT MSG", 14, 0);
+    
+/*     
+    char* msg_interrupt = "Mensaje interrupt";
+    send(kernelDispatchFd, msg_dispatch, sizeof(msg_dispatch, 0));
+ */
     while(server_escuchar(SERVERNAME, server_fd, mainLog));
     cerrar_programa(mainConfig, mainLog, &server_fd);
 }

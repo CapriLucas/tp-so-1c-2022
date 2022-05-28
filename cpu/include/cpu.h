@@ -9,6 +9,8 @@
 
 #include "config.h"
 #include "init.h"
+#include "dispatch.h"
+#include "interrupt.h"
 
 // Shared
 #include "protocolo.h"

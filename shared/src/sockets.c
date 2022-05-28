@@ -16,7 +16,7 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
 
     bool conecto = false;
 
-        // Itera por cada addrinfo devuelto
+    // Itera por cada addrinfo devuelto
     for (struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
         socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (socket_servidor == -1) // fallo de crear socket
@@ -74,7 +74,7 @@ int server_init (t_log* logger, const char* name, char* port) {
 
     for(;;);
 
-    return 0;
+    return serverFd;
 }
 
 // ESPERAR CONEXION DE CLIENTE EN UN SERVER ABIERTO
