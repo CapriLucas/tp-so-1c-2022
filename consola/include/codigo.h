@@ -16,7 +16,6 @@
 #include "shared_utils.h"
 
 void enviarInstrucciones(char* texto_crudo,int kernelFd);
- 
 
 
 #endif

@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 typedef struct {
-    char* IP_KERNEL;
-    uint16_t PUERTO_KERNEL;
+    char*       IP_KERNEL;
+    uint16_t    PUERTO_KERNEL;
 } t_config_consola;
 
 #endif
