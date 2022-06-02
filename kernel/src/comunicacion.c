@@ -2,13 +2,45 @@
 
 // Tamanio por cada instruccion
 // Incluye el entero previo que marca su size
-uint32_t TAMANO_INSTRUCCION = sizeof(uint32_t) * 3;
+uint32_t TAMANO_INSTRUCCION = sizeof(uint32_t) * 4;
 
 typedef struct {
-    int fd;
+    int  fd;
     char* server_name;
     t_log* logger;
 } t_procesar_conexion_args;
+
+
+const char* get_instruction_name(instruccion_cod instruccion_cod) {
+
+	switch(instruccion_cod) {
+		case NO_OP:		return "NO_OP";
+		case I_O: 		return "I/O";
+		case READ:		return "READ";
+		case COPY:		return "COPY";
+		case WRITE:		return "WRITE";
+		case EXIT:		return "EXIT";
+		default:		return "";
+	}
+}
+
+procesar_instruccion(t_instruccion* instruccion, int client_fd, t_log* logger) {
+
+    log_info(logger,"Size: %d\nCódigo instrucción: %s\nParámetro 1: %d\nParámetro 2: %d\n", 
+        8,      // Memory size
+        get_instruction_name(instruccion->codigo_instruccion), 
+        instruccion->param_1, 
+        instruccion->param_2
+    );
+        
+    if (instruccion->codigo_instruccion == 5) {
+        send(client_fd, "EXIT", 4, 0);
+        liberar_conexion(&client_fd);
+    }    
+}
+
+
+
 
 static t_instruccion* recibir_instruccion (void* stream, uint16_t posicion){
     t_instruccion* instruccion = malloc(sizeof(t_instruccion));
@@ -20,7 +52,12 @@ static t_instruccion* recibir_instruccion (void* stream, uint16_t posicion){
     stream += sizeof(uint32_t);
     memcpy(&(instruccion->codigo_instruccion), stream, sizeof(uint32_t));
     stream += sizeof(uint32_t);
-    memcpy(&(instruccion->parametro), stream, sizeof(uint32_t));
+/*     memcpy(&(instruccion->parametro), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t); */
+
+    memcpy(&(instruccion->param_1), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(instruccion->param_2), stream, sizeof(uint32_t));
     stream += sizeof(uint32_t);
 
     return instruccion;
@@ -57,16 +94,18 @@ static void procesar_conexion(void* void_args) {
     if(recibir_header(paquete, cliente_socket, logger) == 0){
         return;
     }
-    for(uint16_t pos = 0; pos < (paquete->buffer->size / TAMANO_INSTRUCCION); pos++){
-        t_instruccion* instruccion = recibir_instruccion(paquete->buffer->stream, pos);
-        
-        log_info(logger,"ACA !!!\nSize: %d\nTipo: %d\nArgumento: %d\n", 8, instruccion->codigo_instruccion, instruccion->parametro);
-        free(instruccion);
-    }
 
+    for(uint16_t pos = 0; pos < (paquete->buffer->size / TAMANO_INSTRUCCION); pos++){
+        t_instruccion* instruccion = recibir_instruccion(paquete->buffer->stream, pos);       
+
+        procesar_instruccion(instruccion, cliente_socket, logger);
+
+
+    }
     eliminar_paquete(paquete);
-    liberar_conexion(&cliente_socket);
+    // liberar_conexion(&cliente_socket);   Se debe mantener la conexión hasta tanto sea procesada la instrucción EXIT.
     return;
+    
 }
 
 int server_escuchar(char* server_name, int server_fd, t_log* logger) {
