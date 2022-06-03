@@ -2,5 +2,5 @@
 FILE=consola
 make $FILE
 if test -f "./$FILE"; then
-    ./$FILE
+    ./$FILE $1 $2
 fi
