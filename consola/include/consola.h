@@ -22,8 +22,8 @@
 
 
 typedef struct {
-    char* PATH;
-    uint32_t MEMORY_SIZE;
+    char*       PATH;
+    uint32_t    MEMORY_SIZE;
 } t_console_cmd;
 
 #endif

@@ -22,6 +22,11 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
         if (socket_servidor == -1) // fallo de crear socket
             continue;
 
+        /*  Evita que el socket quede en un limbo y se pueda reutilizar en forma inmediata, 
+            sin necesidad de esperar a que el S.O. lo libere. */
+        int active = 1;
+        setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &active, sizeof(active));
+
         if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
             // Si entra aca fallo el bind
             close(socket_servidor);

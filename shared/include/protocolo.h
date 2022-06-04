@@ -44,8 +44,23 @@ typedef enum {
 
 typedef struct {
 	instruccion_cod codigo_instruccion;
-	uint32_t parametro;
+	uint32_t param_1;
+	uint32_t param_2;
 } t_instruccion;
+
+typedef struct {
+    t_instruccion*  instruction;    
+} t_instruction_set;
+
+typedef struct {
+    uint32_t    pid;                        // Process ID - Identificador del proceso
+    uint32_t    process_size;               // Tamaño en bytes del proceso
+    t_instruction_set*  t_instruction_set;  // Lista de instrucciones a ejecutar
+    uint32_t    pc;                         // Program Couner - Número de la próxima instrucción a ejecutar
+    uint32_t    page_table_id;              // Identificador de la tabla de páginas del proceso en memoria
+    uint32_t    burst_prediction;           // Estimación para planificación bajo algoritmo SRT
+} t_PCB;
+
 
 t_paquete* crear_paquete(op_code codigo_operacion);
 void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);
