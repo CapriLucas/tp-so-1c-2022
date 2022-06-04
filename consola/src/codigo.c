@@ -35,7 +35,6 @@ const char* get_instruction_name(instruccion_cod instruccion_cod) {
 	}
 }
 
-
 void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 	char** arrayInstrucciones = string_split(texto_crudo, "\n");
 
@@ -72,12 +71,6 @@ void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 				break;
 
 		}
-/* 		if(aux->codigo_instruccion == EXIT){
-			aux->param_1 = 0;
-			aux->param_2 = 0;
-		} else {
-			aux->parametro = atoi(instruccion[1]);
-		} */
 
  		printf("Instrucción #%d\n", i+1);
 		printf("Instrucción: %s\n", get_instruction_name(aux->codigo_instruccion));
@@ -94,10 +87,7 @@ void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 
 void enviarInstrucciones(char* texto_crudo,int kernelFd){
 	t_paquete* paquete = crear_paquete(ENVIAR_PSEUDO_CODIGO);
-	parse_texto_crudo(texto_crudo, paquete);
-
-
-	
+	parse_texto_crudo(texto_crudo, paquete);	
 	enviar_paquete(paquete, kernelFd);
     eliminar_paquete(paquete);
 }

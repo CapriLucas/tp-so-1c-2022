@@ -52,31 +52,6 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto) {
     return socket_servidor;
 }
 
-int server_init (t_log* logger, const char* name, char* port) {
-
-    struct sockaddr_in serverAddress;
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
-    serverAddress.sin_port = htons(8001);
-
-    int serverFd = socket(AF_INET, SOCK_STREAM, 0);
-
-    int active = 1;
-    setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &active, sizeof(active));
-
-    if (bind(serverFd, (void*) &serverAddress, sizeof(serverAddress)) != 0 ) {
-        perror("Bind error.");
-        return 1;
-    }
-
-    printf("Listening on %s ...\n", port);
-    listen(serverFd, SOMAXCONN);
-
-    for(;;);
-
-    return serverFd;
-}
-
 // ESPERAR CONEXION DE CLIENTE EN UN SERVER ABIERTO
 int esperar_cliente(t_log* logger, const char* name, int socket_servidor) {
     struct sockaddr_in dir_cliente;

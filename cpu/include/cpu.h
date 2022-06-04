@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include "config.h"
 #include "init.h"

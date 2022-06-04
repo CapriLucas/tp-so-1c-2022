@@ -17,6 +17,6 @@
 
 uint8_t cargar_configuracion(t_config_CPU*, t_log*);
 uint8_t generar_conexiones(int*, t_config_CPU*, t_log*);
-void cerrar_programa(t_config_CPU*, t_log*, int*, int*);
+void cerrar_programa(t_config_CPU*, t_log*, int*);
 
 #endif

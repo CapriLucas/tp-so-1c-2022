@@ -25,8 +25,9 @@ void dispatch_server() {
         "8001"  // mainConfig->PUERTO_ESCUCHA_DISPATCH
     );
 
-    if (!cpuDispatchFd) {    
-        cerrar_programa(mainConfig, mainLog, &cpuDispatchFd, NULL);        
+    if (!cpuDispatchFd) {
+        liberar_conexion(&cpuDispatchFd);
+        exit(EXIT_FAILURE);
     }
 
     // Esperar conexión de KERNEL para mensajes de dispatch
@@ -43,6 +44,9 @@ void dispatch_server() {
     buffer[recv_bytes] = '\0';
     printf("Mensaje: %s\n", buffer);
     free(buffer);
+
+    liberar_conexion(&cpuDispatchFd);
+    liberar_conexion(&kernelDispatchFd);
 }
 
 
@@ -50,7 +54,6 @@ void interrupt_server() {
 
     int cpuInterruptFd;
     int kernelInterruptFd;
-
 
     // Puerto en el cual se escuchará la conexión del Kernel para mensajes de interrupciones
     cpuInterruptFd = iniciar_servidor (
@@ -61,8 +64,8 @@ void interrupt_server() {
     );
 
     if (!cpuInterruptFd) {    
-        cerrar_programa(mainConfig, mainLog, &cpuInterruptFd, NULL);
-        return EXIT_FAILURE;
+        liberar_conexion(&cpuInterruptFd);
+        exit(EXIT_FAILURE);
     }
 
     // Esperar conexión de KERNEL para mensajes de interrupciones
@@ -80,6 +83,8 @@ void interrupt_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
+    liberar_conexion(&cpuInterruptFd);
+    liberar_conexion(&kernelInterruptFd);
 }
 
 
@@ -97,11 +102,9 @@ int main(){
     printf("PUERTO_ESCUCHA_DISPATCH: %u\n", mainConfig->PUERTO_ESCUCHA_DISPATCH);
     printf("PUERTO_ESCUCHA_INTERRUPT: %u\n", mainConfig->PUERTO_ESCUCHA_INTERRUPT);
 
-
-    int memoriaFd;
     
-
     // Crear conexión con MEMORIA
+    int memoriaFd;
     memoriaFd = crear_conexion (
         mainLog, 
         "CPU", 
@@ -109,21 +112,17 @@ int main(){
         "8002" // mainConfig->PUERTO_MEMORIA
     );
 
-    if (!memoriaFd) {    
-        cerrar_programa(mainConfig, mainLog, &memoriaFd, NULL);
+    if (!memoriaFd) {        
+        cerrar_programa(mainConfig, mainLog, &memoriaFd);
         return EXIT_FAILURE;
     }
-
-   
-    // cpuDispatchFd = server_init(mainLog, "CPU", "8001");
-        // mainConfig->PUERTO_ESCUCHA_DISPATCH
-    
 
     // Thread en que escuchará los mensajes de dispatch enviados por KERNEL
     pthread_t THREAD_DISPATCH;
     if (!pthread_create(&THREAD_DISPATCH, NULL, (void*) dispatch_server, NULL))
         pthread_detach(THREAD_DISPATCH);
     else {
+        cerrar_programa(mainConfig, mainLog, &memoriaFd);
         return EXIT_FAILURE;
     }
 
@@ -132,11 +131,13 @@ int main(){
     if (!pthread_create(&THREAD_INTERRUPT, NULL, (void*) interrupt_server, NULL))
         pthread_detach(THREAD_INTERRUPT);
     else {
+        cerrar_programa(mainConfig, mainLog, &memoriaFd);
         return EXIT_FAILURE;
     }  
 
     for(;;);
+    pthread_join(THREAD_DISPATCH, NULL);
+    pthread_join(THREAD_INTERRUPT, NULL);
 
-    //cerrar_programa(mainConfig, mainLog, &cpuDispatchFd, &cpuInterruptFd);
-
+    cerrar_programa(mainConfig, mainLog, &memoriaFd);
 }
