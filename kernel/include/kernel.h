@@ -11,4 +11,11 @@
 #include "shared_utils.h"
 
 #define SERVERNAME "KERNEL_SERVER"
+
+//Global variables
+
+extern t_log* mainLog;
+extern t_config_kernel* mainConfig;
+extern int server_fd;
+
 #endif
