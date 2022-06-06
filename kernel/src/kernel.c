@@ -11,19 +11,13 @@ int main(){
     int kernelDispatchFd;
     int kernelInterruptFd;
 
-    // Test load kernel.config --Borrar
-    printf("IP_MEMORIA: %s\n", mainConfig->IP_MEMORIA);
-    printf("PUERTO_MEMORIA: %u\n", mainConfig->PUERTO_MEMORIA);
-    printf("IP_CPU: %s\n", mainConfig->IP_CPU);
-    printf("PUERTO_CPU_DISPATCH: %u\n", mainConfig->PUERTO_CPU_DISPATCH);
-    printf("PUERTO_CPU_INTERRUPT: %u\n", mainConfig->PUERTO_CPU_INTERRUPT);
-    printf("PUERTO_ESCUCHA: %u\n", mainConfig->PUERTO_ESCUCHA);
-    printf("ALGORITMO_PLANIFICACION: %s\n", mainConfig->ALGORITMO_PLANIFICACION);
-    printf("ESTIMACION_INICIAL: %u\n", mainConfig->ESTIMACION_INICIAL);
-    printf("ALFA: %f\n", mainConfig->ALFA);
-    printf("GRADO_MULTIPROGRAMACION: %u\n", mainConfig->GRADO_MULTIPROGRAMACION);
-    printf("TIEMPO_MAXIMO_BLOQUEADO: %u\n", mainConfig->TIEMPO_MAXIMO_BLOQUEADO);
-
+    pthread_t THREAD_LARGO_PLAZO;
+    if(!pthread_create(&THREAD_LARGO_PLAZO, NULL, (void*) handler_largo_plazo, NULL))
+        pthread_detach(THREAD_LARGO_PLAZO);
+    else {
+        log_error(mainLog, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE LARGO PLAZO. ABORTANDO.");
+        return EXIT_FAILURE;
+    }
 
     // Crear conexión con MEMORIA
     memoriaFd = crear_conexion (
@@ -64,6 +58,8 @@ int main(){
     char* msg_interrupt = "Mensaje interrupt";
     send(kernelDispatchFd, msg_dispatch, sizeof(msg_dispatch, 0));
  */
-    while(server_escuchar(SERVERNAME, server_fd, mainLog));
+
+    //TODO ver como sacar esta espera activa del main thread
+    while(1);
     cerrar_programa(mainConfig, mainLog, &server_fd);
 }

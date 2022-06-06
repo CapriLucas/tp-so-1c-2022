@@ -10,8 +10,9 @@
 #include "shared_utils.h"
 #include "sockets.h"
 #include "protocolo.h"
+#include "global.h"
 
 
-int server_escuchar(char* server_name, int server_socket, t_log* logger);
+int server_escuchar(char* server_name, int server_socket);
 
 #endif

@@ -75,9 +75,25 @@ uint8_t cargar_configuracion(t_config_kernel* config, t_log* mainLog) {
 
 void initializeKernel(){
     mainLog = log_create("./logs/kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+    initializeSemaphores();
+    initializeLists();
     mainConfig = malloc(sizeof(t_config_kernel));
     if (!cargar_configuracion(mainConfig, mainLog) || !crear_servidor(mainConfig, mainLog, &server_fd, SERVERNAME)){
         liberar_conexion(&server_fd);
         exit(EXIT_FAILURE);
     }
+}
+
+pthread_mutex_t MUTEX_LISTA_NEW;
+sem_t CONTADOR_LISTA_NEW;
+
+void initializeSemaphores(){
+    pthread_mutex_init(&MUTEX_LISTA_NEW, NULL);
+    sem_init(&CONTADOR_LISTA_NEW, 0, 0);
+}
+
+t_list* LISTA_NEW;
+
+void initializeLists(){
+    LISTA_NEW = list_create();
 }
