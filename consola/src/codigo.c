@@ -85,9 +85,15 @@ void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 	string_array_destroy(arrayInstrucciones);
 }
 
-void enviarInstrucciones(char* texto_crudo,int kernelFd){
+void enviarInstrucciones(char* texto_crudo,int kernelFd, uint32_t memory_size){
 	t_paquete* paquete = crear_paquete(ENVIAR_PSEUDO_CODIGO);
+
+	// Agregamos el memory_size
+	agregar_a_paquete(paquete, &memory_size, sizeof(uint32_t));
+
+	// Agregamos todas las instrucciones
 	parse_texto_crudo(texto_crudo, paquete);	
+	
 	enviar_paquete(paquete, kernelFd);
     eliminar_paquete(paquete);
 }
