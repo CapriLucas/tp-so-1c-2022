@@ -14,6 +14,7 @@
 //Global variables
 
 #include "kernel.h"
+#include "synchro.h"
 
 //Shared
 #include "sockets.h"
@@ -25,6 +26,5 @@ uint8_t generar_conexiones(int*, t_config_kernel*, t_log*);
 void cerrar_programa(t_config_kernel*, t_log*, int* server_fd);
 bool crear_servidor(t_config_kernel* cfg, t_log* logger, int* fd, char* name);
 void initializeKernel();
-void initializeSemaphores();
 
 #endif
