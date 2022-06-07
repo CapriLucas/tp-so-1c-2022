@@ -18,6 +18,9 @@ extern t_log* mainLog;
 extern t_config_kernel* mainConfig;
 extern int server_fd;
 
+extern uint32_t current_pid;
+extern pthread_mutex_t MUTEX_CURRENT_PID;
+
 // Listas/colas de procesos
 
 // -- Lista NEW

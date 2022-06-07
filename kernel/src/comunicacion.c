@@ -22,28 +22,6 @@ const char* get_instruction_name(instruccion_cod instruccion_cod) {
 	}
 }
 
-// Por cada instruccion recibida la guardamos en la lista de NEW y sumamos uno a su contador
-void procesar_instruccion(t_instruccion* instruccion, int client_fd) {
-
-    log_info(mainLog,"Size: %d\nCódigo instrucción: %s\nParámetro 1: %d\nParámetro 2: %d\n", 
-        8,      // Memory size
-        get_instruction_name(instruccion->codigo_instruccion), 
-        instruccion->param_1, 
-        instruccion->param_2
-    );
-    
-    pthread_mutex_lock(&MUTEX_LISTA_NEW);
-    list_add(LISTA_NEW, (void*) instruccion);
-    pthread_mutex_unlock(&MUTEX_LISTA_NEW);
-    sem_post(&CONTADOR_LISTA_NEW);
-
-//TODO esto se tiene que sacar al crear hilo de exit
-    if (instruccion->codigo_instruccion == 5) {
-        send(client_fd, "EXIT", 4, 0);
-        liberar_conexion(&client_fd);
-    }
-}
-
 static t_instruccion* recibir_instruccion (void* stream, uint16_t posicion){
     t_instruccion* instruccion = malloc(sizeof(t_instruccion));
 
@@ -86,6 +64,8 @@ static void procesar_conexion(void* void_args) {
     int cliente_socket = args->fd;
     free(args);
 
+    t_list* lista_instrucciones = list_create();
+
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
     if(recibir_header(paquete, cliente_socket) == 0){
@@ -94,9 +74,22 @@ static void procesar_conexion(void* void_args) {
 
     for(uint16_t pos = 0; pos < (paquete->buffer->size / TAMANO_INSTRUCCION); pos++){
         t_instruccion* instruccion = recibir_instruccion(paquete->buffer->stream, pos);       
+        list_add(lista_instrucciones, instruccion);
 
-        procesar_instruccion(instruccion, cliente_socket);
+        //TODO esto se tiene que sacar al crear hilo de exit
+        if (instruccion->codigo_instruccion == 5) {
+            send(cliente_socket, "EXIT", 4, 0);
+            liberar_conexion(&cliente_socket);
+        }
     }
+
+    //TODO ver campos hardcodeados al crear pcb de instruccion
+    t_PCB* pcb = crear_pcb(8, lista_instrucciones, 0, 0, 0);
+    
+    pthread_mutex_lock(&MUTEX_LISTA_NEW);
+    list_add(LISTA_NEW, (void*) pcb);
+    pthread_mutex_unlock(&MUTEX_LISTA_NEW);
+    sem_post(&CONTADOR_LISTA_NEW);
 
     eliminar_paquete(paquete);
     return;
@@ -116,4 +109,21 @@ int server_escuchar(char* server_name, int server_fd) {
         return 1;
     }
     return 0;
+}
+
+t_PCB* crear_pcb(uint32_t process_size, 
+                t_list* instructions_list, uint32_t pc, 
+                uint32_t page_table_id, uint32_t burst_prediction){
+
+    t_PCB* pcb = malloc(sizeof(t_PCB));
+    pcb->process_size = process_size;
+    pcb->instructions_list = instructions_list;
+    pcb->pc = pc;
+    pcb->page_table_id = page_table_id;
+    pcb->burst_prediction = burst_prediction;
+
+    pthread_mutex_lock(&MUTEX_CURRENT_PID);
+    pcb->pid = current_pid + 1;
+    current_pid = current_pid + 1;
+    pthread_mutex_unlock(&MUTEX_CURRENT_PID);
 }

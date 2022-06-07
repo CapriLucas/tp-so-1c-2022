@@ -3,6 +3,7 @@
 t_log* mainLog;
 t_config_kernel* mainConfig;
 int server_fd;
+uint32_t current_pid;
 
 int main(){
     initializeKernel();
