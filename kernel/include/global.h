@@ -13,11 +13,16 @@
 #define SERVERNAME "KERNEL_SERVER"
 
 //Global variables
-
 extern t_log* mainLog;
 extern t_config_kernel* mainConfig;
-extern int server_fd;
 
+// File descriptors
+extern int server_fd;
+extern int memoriaFd;
+extern int kernelDispatchFd;
+extern int kernelInterruptFd;
+
+// CURRENT_PID
 extern uint32_t current_pid;
 extern pthread_mutex_t MUTEX_CURRENT_PID;
 

@@ -10,9 +10,6 @@
 #include <readline/readline.h>
 
 #include "config.h"
-
-//Global variables
-
 #include "kernel.h"
 #include "synchro.h"
 
