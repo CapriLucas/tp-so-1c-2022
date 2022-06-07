@@ -45,6 +45,9 @@ void dispatch_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
+    t_PCB* pcb;
+    fetch_instruction(pcb, mainConfig, mainLog);
+
     liberar_conexion(&cpuDispatchFd);
     liberar_conexion(&kernelDispatchFd);
 }
@@ -83,10 +86,48 @@ void interrupt_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
+
+
     liberar_conexion(&cpuInterruptFd);
     liberar_conexion(&kernelInterruptFd);
 }
 
+
+int fetch_instruction (t_PCB* pcb, t_config_CPU* config, t_log* log) {
+    
+    t_instruccion* instruction = malloc(sizeof(t_instruccion));
+
+    int instruction_code = 0; 
+    instruction->param_1 = 3;
+    //instruction = pcb->t_instruccion[pcb->pc];
+
+    //instruction_code* instruction_code = instruccion->instruccion_cod
+
+    switch (instruction_code) {
+        
+        case NO_OP:
+            exec_no_op(instruction, config, log);
+            break;
+        case I_O:
+            exec_i_o(instruction, config, log);
+            break;
+        case READ:
+            exec_read(instruction, config, log);
+            break;
+        case WRITE:
+            exec_write(instruction, config, log);
+            break;
+        case COPY:
+            exec_copy(instruction, config, log);
+            break;
+        case EXIT:
+            exec_exit(instruction, config, log);
+            break;
+
+    }
+
+    return EXIT_SUCCESS;
+}
 
 
 int main(){
