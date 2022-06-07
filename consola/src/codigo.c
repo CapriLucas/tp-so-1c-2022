@@ -1,47 +1,12 @@
 #include "codigo.h"
 
-instruccion_cod mapInstrCodToEnum(char* string){
-	if(strcmp(string, "NO_OP") == 0){
-		return NO_OP;
-	}
-	if(strcmp(string,"I/O") == 0){
-		return I_O;
-	}
-	if(strcmp(string,"WRITE") == 0){
-		return WRITE;
-	}
-	if(strcmp(string,"COPY") == 0){
-		return COPY;
-	}
-	if(strcmp(string,"READ") == 0){
-		return READ;
-	}
-	if(strcmp(string,"EXIT") == 0){
-		return EXIT;
-	}
-	return -1;
-}
-
-const char* get_instruction_name(instruccion_cod instruccion_cod) {
-
-	switch(instruccion_cod) {
-		case NO_OP:		return "NO_OP";
-		case I_O: 		return "I/O";
-		case READ:		return "READ";
-		case COPY:		return "COPY";
-		case WRITE:		return "WRITE";
-		case EXIT:		return "EXIT";
-		default:		return "";
-	}
-}
-
 void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 	char** arrayInstrucciones = string_split(texto_crudo, "\n");
 
 	for(int i=0; i< string_array_size(arrayInstrucciones); i++){
 		char** instruccion = string_split(arrayInstrucciones[i]," ");
 		t_instruccion* aux = malloc(sizeof(t_instruccion));
-		aux->codigo_instruccion= mapInstrCodToEnum(instruccion[0]);
+		aux->codigo_instruccion = get_instruction_cod(instruccion[0]);
 
 		switch(aux->codigo_instruccion) {
 

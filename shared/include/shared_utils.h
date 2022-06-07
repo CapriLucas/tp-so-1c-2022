@@ -8,8 +8,11 @@
 #include <stdbool.h>
 #include <commons/config.h>
 
-char* mi_funcion_compartida();
+#include "protocolo.h"
+
 bool config_has_all_properties(t_config* , char**);
 char* leer_archivo_completo(char* path);
+char* get_instruction_name(instruccion_cod cod);
+instruccion_cod get_instruction_cod(char* string);
 
 #endif

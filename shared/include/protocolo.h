@@ -15,8 +15,6 @@
 #include <commons/string.h>
 #include <commons/log.h>
 
-//Shared
-#include "shared_utils.h"
 
 typedef enum {
 	ENVIAR_PSEUDO_CODIGO,

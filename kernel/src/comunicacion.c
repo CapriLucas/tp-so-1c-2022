@@ -8,20 +8,6 @@ typedef struct {
     int  fd;
 } t_procesar_conexion_args;
 
-
-const char* get_instruction_name(instruccion_cod instruccion_cod) {
-
-	switch(instruccion_cod) {
-		case NO_OP:		return "NO_OP";
-		case I_O: 		return "I/O";
-		case READ:		return "READ";
-		case COPY:		return "COPY";
-		case WRITE:		return "WRITE";
-		case EXIT:		return "EXIT";
-		default:		return "";
-	}
-}
-
 static uint32_t recibir_memory_size(void* stream) {
     uint32_t process_memory_size;
 
