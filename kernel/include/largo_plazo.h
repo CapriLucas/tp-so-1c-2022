@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <commons/log.h>
 #include <stdbool.h>
+#include <pthread.h>
 
+#include "protocolo.h"
+#include "comunicacion.h"
 //Global variables import
 #include "global.h"
 

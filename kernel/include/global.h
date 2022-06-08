@@ -26,11 +26,19 @@ extern int kernelInterruptFd;
 extern uint32_t current_pid;
 extern pthread_mutex_t MUTEX_CURRENT_PID;
 
+// Nivel de multiprogramacion
+extern sem_t GRADO_MULTIPROGRAMACION;
+
 // Listas/colas de procesos
 
 // -- Lista NEW
 extern t_list* LISTA_NEW;
 extern pthread_mutex_t MUTEX_LISTA_NEW;
 extern sem_t CONTADOR_LISTA_NEW;
+
+// -- Lista READY
+extern t_list* LISTA_READY;
+extern pthread_mutex_t MUTEX_LISTA_READY;
+extern sem_t CONTADOR_LISTA_READY;
 
 #endif

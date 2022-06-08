@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <semaphore.h>
+#include <pthread.h>
+
+#include <global.h>
 
 
 void initializeSemaphores();

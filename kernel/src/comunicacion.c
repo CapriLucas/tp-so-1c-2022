@@ -128,7 +128,13 @@ t_PCB* crear_pcb(uint32_t process_size,
     pcb->burst_prediction = burst_prediction;
 
     pthread_mutex_lock(&MUTEX_CURRENT_PID);
+    // TODO refactorizar esto a:
+    // pcb->pid = next_pid;
+    // next_pid = next_pid + 1;
+    // Asi utilizamos el cero y queda semanticamente correcto
     pcb->pid = current_pid + 1;
     current_pid = current_pid + 1;
     pthread_mutex_unlock(&MUTEX_CURRENT_PID);
+
+    return pcb;
 }
