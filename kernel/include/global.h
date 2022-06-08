@@ -22,9 +22,9 @@ extern int memoriaFd;
 extern int kernelDispatchFd;
 extern int kernelInterruptFd;
 
-// CURRENT_PID
-extern uint32_t current_pid;
-extern pthread_mutex_t MUTEX_CURRENT_PID;
+// NEXT_PID
+extern uint32_t next_pid;
+extern pthread_mutex_t MUTEX_NEXT_PID;
 
 // Nivel de multiprogramacion
 extern sem_t GRADO_MULTIPROGRAMACION;

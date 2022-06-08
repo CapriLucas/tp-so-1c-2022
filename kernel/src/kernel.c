@@ -6,7 +6,7 @@ int server_fd;
 int memoriaFd;
 int kernelDispatchFd;
 int kernelInterruptFd;
-uint32_t current_pid;
+uint32_t next_pid;
 
 int main(){
     initializeKernel();

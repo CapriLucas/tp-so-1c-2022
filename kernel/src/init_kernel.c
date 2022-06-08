@@ -83,7 +83,7 @@ void initializeLists(){
 
 void initializeKernel(){
     mainLog = log_create("./logs/kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
-    current_pid = 0;
+    next_pid = 0;
     mainConfig = malloc(sizeof(t_config_kernel));
     if (!cargar_configuracion(mainConfig, mainLog) || !crear_servidor(mainConfig, mainLog, &server_fd, SERVERNAME)){
         liberar_conexion(&server_fd);
