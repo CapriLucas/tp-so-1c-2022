@@ -1,41 +1,85 @@
 #include "cpu.h"
 
-t_log* mainLog;
-t_config_CPU* mainConfig;
-
-
 static void inicializar_proceso() {
-    mainLog = log_create("./logs/cpu.log", "CPU", true, LOG_LEVEL_INFO);
-    mainConfig = malloc(sizeof(t_config_CPU));
-    if (!cargar_configuracion(mainConfig, mainLog)) {
+    log_CPU = log_create("./logs/cpu.log", "CPU", true, LOG_LEVEL_INFO);
+    config_CPU = malloc(sizeof(t_config_CPU));
+    if (!cargar_configuracion(config_CPU, log_CPU)) {
         exit(EXIT_FAILURE);
     }
 }
 
-void dispatch_server() {
+
+int fetch_instruction (t_PCB* pcb) {
+
+    pcb->pid = 10;
+    pcb->process_size = 64;
+    pcb->pc = 1;
+    pcb->page_table_id = 16;
+    pcb->burst_prediction = 3;
+
+    // Borrar
+    printf("PCB Process ID: %u\n", pcb->pid);
+    printf("PCB Process size: %u\n", pcb->process_size);
+    printf("PCB Program counter: %u\n", pcb->pc);
+    printf("PCB Page table ID: %u\n", pcb->page_table_id);
+    printf("PCB Burst prediction: %u\n", pcb->burst_prediction);
+    //
     
-    int cpuDispatchFd;
-    int kernelDispatchFd;
+    int instruction_code = 5;
+
+    switch (instruction_code) {
+        
+        case NO_OP:
+            exec_no_op(pcb);
+            break;
+        case I_O:
+            exec_i_o(pcb);
+            break;
+        case READ:
+            exec_read(pcb);
+            break;
+        case COPY:
+            exec_copy(pcb);
+            break;
+        case WRITE:
+            exec_write(pcb);
+            break;
+        case EXIT:
+            exec_exit(pcb);
+            break;
+
+    }
+
+    return EXIT_SUCCESS;
+}
+
+
+void dispatch_server() {
 
     // Inicia server en puerto en el cual se escuchará la conexión del Kernel para mensajes de dispatch
     cpuDispatchFd = iniciar_servidor (
-        mainLog,
+        log_CPU,
         "CPU",
         "127.0.0.1", 
-        "8001"  // mainConfig->PUERTO_ESCUCHA_DISPATCH
+        "8001"  // config_CPU->PUERTO_ESCUCHA_DISPATCH
     );
 
     if (!cpuDispatchFd) {
-        liberar_conexion(&cpuDispatchFd);
+        cerrar_programa();
         exit(EXIT_FAILURE);
     }
 
     // Esperar conexión de KERNEL para mensajes de dispatch
     kernelDispatchFd = esperar_cliente (
-        mainLog, 
+        log_CPU, 
         "KERNEL", 
         cpuDispatchFd
     );
+
+    if (!kernelDispatchFd) {
+        cerrar_programa();
+        exit(EXIT_FAILURE);
+    }
 
     // Test thread & dispatch message from kernel. -- Borrar
     printf("Estoy dentro del hilo dispatch.\n");
@@ -45,38 +89,39 @@ void dispatch_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
-    t_PCB* pcb;
-    fetch_instruction(pcb, mainConfig, mainLog);
+    t_PCB* pcb = malloc(sizeof(t_PCB));
+    
+    fetch_instruction(pcb);
 
-    liberar_conexion(&cpuDispatchFd);
-    liberar_conexion(&kernelDispatchFd);
 }
 
 
 void interrupt_server() {
 
-    int cpuInterruptFd;
-    int kernelInterruptFd;
-
     // Puerto en el cual se escuchará la conexión del Kernel para mensajes de interrupciones
     cpuInterruptFd = iniciar_servidor (
-        mainLog,
+        log_CPU,
         "CPU",
         "127.0.0.1", 
-        "8005"  // mainConfig->PUERTO_ESCUCHA_INTERRUPT
+        "8005"  // config_CPU->PUERTO_ESCUCHA_INTERRUPT
     );
 
     if (!cpuInterruptFd) {    
-        liberar_conexion(&cpuInterruptFd);
+        cerrar_programa();
         exit(EXIT_FAILURE);
     }
 
     // Esperar conexión de KERNEL para mensajes de interrupciones
     kernelInterruptFd = esperar_cliente (
-        mainLog, 
+        log_CPU, 
         "KERNEL", 
         cpuInterruptFd
     );
+
+    if (!kernelInterruptFd) {    
+        cerrar_programa();
+        exit(EXIT_FAILURE);
+    }
 
     // Test thread & interrupt message from kernel. -- Borrar
     printf("Estoy dentro del hilo interrupt.\n");
@@ -86,75 +131,34 @@ void interrupt_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
-
-
-    liberar_conexion(&cpuInterruptFd);
-    liberar_conexion(&kernelInterruptFd);
 }
 
-
-int fetch_instruction (t_PCB* pcb, t_config_CPU* config, t_log* log) {
-    
-    t_instruccion* instruction = malloc(sizeof(t_instruccion));
-
-    int instruction_code = 0; 
-    instruction->param_1 = 3;
-    //instruction = pcb->t_instruccion[pcb->pc];
-
-    //instruction_code* instruction_code = instruccion->instruccion_cod
-
-    switch (instruction_code) {
-        
-        case NO_OP:
-            exec_no_op(instruction, config, log);
-            break;
-        case I_O:
-            exec_i_o(instruction, config, log);
-            break;
-        case READ:
-            exec_read(instruction, config, log);
-            break;
-        case WRITE:
-            exec_write(instruction, config, log);
-            break;
-        case COPY:
-            exec_copy(instruction, config, log);
-            break;
-        case EXIT:
-            exec_exit(instruction, config, log);
-            break;
-
-    }
-
-    return EXIT_SUCCESS;
-}
 
 
 int main(){
 
     inicializar_proceso();
 
-    // Test load cpu.config -- Borrar
-    printf("ENTRADAS_TLB: %u\n", mainConfig->ENTRADAS_TLB);
-    printf("REEMPLAZO_TLB: %s\n", mainConfig->REEMPLAZO_TLB);
-    printf("RETARDO_NOOP: %u\n", mainConfig->RETARDO_NOOP);
-    printf("IP_MEMORIA: %s\n", mainConfig->IP_MEMORIA);
-    printf("PUERTO_MEMORIA: %u\n", mainConfig->PUERTO_MEMORIA);
-    printf("PUERTO_ESCUCHA_DISPATCH: %u\n", mainConfig->PUERTO_ESCUCHA_DISPATCH);
-    printf("PUERTO_ESCUCHA_INTERRUPT: %u\n", mainConfig->PUERTO_ESCUCHA_INTERRUPT);
+    // Test load config_CPU -- Borrar
+    printf("ENTRADAS_TLB: %u\n", config_CPU->ENTRADAS_TLB);
+    printf("REEMPLAZO_TLB: %s\n", config_CPU->REEMPLAZO_TLB);
+    printf("RETARDO_NOOP: %u\n", config_CPU->RETARDO_NOOP);
+    printf("IP_MEMORIA: %s\n", config_CPU->IP_MEMORIA);
+    printf("PUERTO_MEMORIA: %u\n", config_CPU->PUERTO_MEMORIA);
+    printf("PUERTO_ESCUCHA_DISPATCH: %u\n", config_CPU->PUERTO_ESCUCHA_DISPATCH);
+    printf("PUERTO_ESCUCHA_INTERRUPT: %u\n", config_CPU->PUERTO_ESCUCHA_INTERRUPT);
 
     
-    // Crear conexión con MEMORIA
-    int memoriaFd;
+    // Crear conexión con MEMORIA 
     memoriaFd = crear_conexion (
-        mainLog, 
+        log_CPU, 
         "CPU", 
-        mainConfig->IP_MEMORIA, 
-        "8002" // mainConfig->PUERTO_MEMORIA
+        config_CPU->IP_MEMORIA, 
+        "8002" // config_CPU->PUERTO_MEMORIA
     );
 
     if (!memoriaFd) {        
-        cerrar_programa(mainConfig, mainLog, &memoriaFd);
+        cerrar_programa();
         return EXIT_FAILURE;
     }
 
@@ -163,7 +167,7 @@ int main(){
     if (!pthread_create(&THREAD_DISPATCH, NULL, (void*) dispatch_server, NULL))
         pthread_detach(THREAD_DISPATCH);
     else {
-        cerrar_programa(mainConfig, mainLog, &memoriaFd);
+        cerrar_programa();
         return EXIT_FAILURE;
     }
 
@@ -172,13 +176,14 @@ int main(){
     if (!pthread_create(&THREAD_INTERRUPT, NULL, (void*) interrupt_server, NULL))
         pthread_detach(THREAD_INTERRUPT);
     else {
-        cerrar_programa(mainConfig, mainLog, &memoriaFd);
+        cerrar_programa();
         return EXIT_FAILURE;
     }  
 
     for(;;);
+
     pthread_join(THREAD_DISPATCH, NULL);
     pthread_join(THREAD_INTERRUPT, NULL);
 
-    cerrar_programa(mainConfig, mainLog, &memoriaFd);
+    cerrar_programa();
 }

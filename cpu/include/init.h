@@ -9,6 +9,7 @@
 #include <readline/readline.h>
 
 #include "config.h"
+#include "cpu.h"
 
 // Shared
 #include "sockets.h"
@@ -17,6 +18,6 @@
 
 uint8_t cargar_configuracion(t_config_CPU*, t_log*);
 uint8_t generar_conexiones(int*, t_config_CPU*, t_log*);
-void cerrar_programa(t_config_CPU*, t_log*, int*);
+void cerrar_programa();
 
 #endif

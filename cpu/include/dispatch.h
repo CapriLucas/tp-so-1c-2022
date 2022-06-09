@@ -12,17 +12,18 @@
 #include "init.h"
 #include "dispatch.h"
 #include "interrupt.h"
+#include "cpu.h"
 
 // Shared
 #include "protocolo.h"
 #include "shared_utils.h"
 
 
-int exec_no_op (t_instruccion*, t_config_CPU*, t_log*);
-int exec_i_o (t_instruccion*, t_config_CPU*, t_log*);
-int exec_read (t_instruccion*, t_config_CPU*, t_log*);
-int exec_write (t_instruccion*, t_config_CPU*, t_log*);
-int exec_copy (t_instruccion*, t_config_CPU*, t_log*);
-int exec_exit (t_instruccion*, t_config_CPU*, t_log*);
+int exec_no_op (t_PCB*);
+int exec_i_o (t_PCB*);
+int exec_read (t_PCB*);
+int exec_write (t_PCB*);
+int exec_copy (t_PCB*);
+int exec_exit (t_PCB*);
 
 #endif
