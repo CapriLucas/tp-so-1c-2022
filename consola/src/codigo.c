@@ -42,7 +42,19 @@ void parse_texto_crudo(char* texto_crudo,t_paquete* paquete){
 		printf("Parámetro 1: %d\n", aux->param_1);
 		printf("Parámetro 2: %d\n\n", aux->param_2);
 
-		agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
+		if(aux->codigo_instruccion == NO_OP){
+			// Agregamos n instrucciones por cada NO_OP
+			for(uint32_t index = 0; index < aux->param_1; index++){
+				t_instruccion* aux = malloc(sizeof(t_instruccion));
+				aux->codigo_instruccion = NO_OP;
+				aux->param_1 = 0;
+				aux->param_2 = 0;
+				agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
+				free(aux);			
+			}
+		} else {
+			agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
+		}
 		string_array_destroy(instruccion);
 		free(aux);
 	}
