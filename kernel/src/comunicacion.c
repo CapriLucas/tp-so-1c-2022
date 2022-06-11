@@ -81,11 +81,7 @@ static void procesar_conexion(void* void_args) {
 
         //TODO sacar esto para testear comunicacion
         // printf("memory: %d\npos: %d\nOp: %s\nparam1: %d; param2: %d\n\n",process_memory_size, pos,get_instruction_name(instruccion->codigo_instruccion),instruccion->param_1,instruccion->param_2);
-        //TODO esto se tiene que sacar al crear hilo de exit
-        if (instruccion->codigo_instruccion == 5) {
-            send(cliente_socket, "EXIT", 4, 0);
-            liberar_conexion(&cliente_socket);
-        }
+        
     }
 
     //TODO ver campos hardcodeados al crear pcb de instruccion
@@ -95,6 +91,14 @@ static void procesar_conexion(void* void_args) {
     list_add(LISTA_NEW, (void*) pcb);
     pthread_mutex_unlock(&MUTEX_LISTA_NEW);
     sem_post(&CONTADOR_LISTA_NEW);
+    
+    t_socket_pid* socket_pid = malloc(sizeof(t_socket_pid));
+    
+    socket_pid->pid = pcb->pid;
+    socket_pid->console_fd = cliente_socket;
+    pthread_mutex_lock(&MUTEX_LISTA_EXIT_PID);
+    list_add(LISTA_EXIT_PID, (void*) socket_pid);
+    pthread_mutex_unlock(&MUTEX_LISTA_EXIT_PID);
 
     eliminar_paquete(paquete);
     return;

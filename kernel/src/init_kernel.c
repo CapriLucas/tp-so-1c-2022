@@ -75,10 +75,14 @@ uint8_t cargar_configuracion(t_config_kernel* config, t_log* mainLog) {
 
 t_list* LISTA_NEW;
 t_list* LISTA_READY;
+t_list* LISTA_EXIT;
+t_list* LISTA_EXIT_PID;
 
 void initializeLists(){
     LISTA_NEW = list_create();
     LISTA_READY = list_create();
+    LISTA_EXIT = list_create();
+    LISTA_EXIT_PID = list_create();
 }
 
 void initializeKernel(){

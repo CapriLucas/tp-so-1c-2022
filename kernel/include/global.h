@@ -10,6 +10,12 @@
 
 #include "config.h"
 
+//TODO mover de aca
+typedef struct {
+    int console_fd;
+    uint32_t pid;    
+} t_socket_pid;
+
 #define SERVERNAME "KERNEL_SERVER"
 
 //Global variables
@@ -40,5 +46,13 @@ extern sem_t CONTADOR_LISTA_NEW;
 extern t_list* LISTA_READY;
 extern pthread_mutex_t MUTEX_LISTA_READY;
 extern sem_t CONTADOR_LISTA_READY;
+
+// -- Lista Exit
+extern t_list* LISTA_EXIT;
+extern t_list* LISTA_EXIT_PID;
+extern pthread_mutex_t MUTEX_LISTA_EXIT;
+extern sem_t CONTADOR_LISTA_EXIT;
+extern pthread_mutex_t MUTEX_LISTA_EXIT_PID;
+
 
 #endif

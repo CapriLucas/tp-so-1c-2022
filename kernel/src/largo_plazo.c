@@ -59,8 +59,53 @@ void handler_new_to_ready(){
     }
 }
 
+
 // Si hay un proceso en la cola de exit. Se encarga de sacarlo y notificarle a memoria y a la consola
+ t_PCB* pcb_exit;
+
+bool _is_the_pcb_to_delete(t_socket_pid *p) {
+    bool res = pcb_exit->pid == p->pid;
+    return res;
+}
+
 void handler_exit(){
     log_info(mainLog, "Controlador de exit done");
+     while(1){
 
+//TODO EN CUANTO ESTE EL PLANIFICADOR CORTO PLAZO SACAR ESTO PORFAVOR
+// //EMULADOR PARA PROBAR pasar de ready a exit apenas vayan llegando
+//         t_PCB* pcb;
+//         sem_wait(&CONTADOR_LISTA_READY);
+//         pthread_mutex_lock(&MUTEX_LISTA_READY);
+//             pcb = list_get(LISTA_READY, 0);
+//             list_remove(LISTA_READY, 0);
+//         pthread_mutex_unlock(&MUTEX_LISTA_READY);
+//         pthread_mutex_lock(&MUTEX_LISTA_EXIT);
+//             list_add(LISTA_EXIT, pcb);
+//             log_info(mainLog,"Agregamos a exit el proceso (%d)",pcb->pid);
+//             sem_post(&CONTADOR_LISTA_EXIT);
+//         pthread_mutex_unlock(&MUTEX_LISTA_EXIT);  
+// // ACA EMPIEZA
+
+        sem_wait(&CONTADOR_LISTA_EXIT);
+        pthread_mutex_lock(&MUTEX_LISTA_EXIT);
+            pcb_exit = list_get(LISTA_EXIT, 0);
+            list_remove(LISTA_EXIT, 0);
+            log_info(mainLog,"obtenemos de exit el proceso (%d)",pcb_exit->pid);
+        pthread_mutex_unlock(&MUTEX_LISTA_EXIT);
+
+        pthread_mutex_lock(&MUTEX_LISTA_EXIT_PID);
+            t_socket_pid* socket_pid = list_find(LISTA_EXIT_PID, (void*) _is_the_pcb_to_delete);
+            list_remove_by_condition(LISTA_EXIT_PID,(void*) _is_the_pcb_to_delete);
+        pthread_mutex_unlock(&MUTEX_LISTA_EXIT_PID);
+
+        int socket_consola = socket_pid->console_fd;
+
+        send(socket_consola, "EXIT", 4, 0);
+        //TODO Mandar senal para matar proceso en memoria;
+        free(socket_pid);
+        free(pcb_exit);
+        liberar_conexion(&socket_consola);
+
+    }
 }
