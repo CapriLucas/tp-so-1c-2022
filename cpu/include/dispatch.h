@@ -19,11 +19,11 @@
 #include "shared_utils.h"
 
 
-int exec_no_op (t_PCB*);
-int exec_i_o (t_PCB*);
-int exec_read (t_PCB*);
-int exec_write (t_PCB*);
-int exec_copy (t_PCB*);
-int exec_exit (t_PCB*);
+int exec_no_op (t_PCB*, t_instruc*);
+int exec_i_o (t_PCB*, t_instruc*);
+int exec_read (t_PCB*, t_instruc*);
+int exec_write (t_PCB*, t_instruc*);
+int exec_copy (t_PCB*, t_instruc*);
+int exec_exit (t_PCB*, t_instruc*);
 
 #endif

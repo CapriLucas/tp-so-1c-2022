@@ -1,55 +1,36 @@
 #include "cpu.h"
 
-static void inicializar_proceso() {
-    log_CPU = log_create("./logs/cpu.log", "CPU", true, LOG_LEVEL_INFO);
-    config_CPU = malloc(sizeof(t_config_CPU));
-    if (!cargar_configuracion(config_CPU, log_CPU)) {
-        exit(EXIT_FAILURE);
-    }
-}
 
+int fetch_instruction (t_PCB* pcb) {  
 
-int fetch_instruction (t_PCB* pcb) {
+    t_instruc* instruc = malloc(sizeof(t_instruc));    
+    instruc = list_get(pcb->l_instruc, pcb->pc);
+    pcb->pc++;
 
-    pcb->pid = 10;
-    pcb->process_size = 64;
-    pcb->pc = 1;
-    pcb->page_table_id = 16;
-    pcb->burst_prediction = 3;
-
-    // Borrar
-    printf("PCB Process ID: %u\n", pcb->pid);
-    printf("PCB Process size: %u\n", pcb->process_size);
-    printf("PCB Program counter: %u\n", pcb->pc);
-    printf("PCB Page table ID: %u\n", pcb->page_table_id);
-    printf("PCB Burst prediction: %u\n", pcb->burst_prediction);
-    //
-    
-    int instruction_code = 5;
-
-    switch (instruction_code) {
+    switch (instruc->instruc_cod) {
         
         case NO_OP:
-            exec_no_op(pcb);
+            exec_no_op(pcb, instruc);
             break;
         case I_O:
-            exec_i_o(pcb);
+            exec_i_o(pcb, instruc);
             break;
         case READ:
-            exec_read(pcb);
+            exec_read(pcb, instruc);
             break;
         case COPY:
-            exec_copy(pcb);
+            exec_copy(pcb, instruc);
             break;
         case WRITE:
-            exec_write(pcb);
+            exec_write(pcb, instruc);
             break;
         case EXIT:
-            exec_exit(pcb);
+            exec_exit(pcb, instruc);
             break;
 
     }
 
+    free(instruc);
     return EXIT_SUCCESS;
 }
 
@@ -89,9 +70,56 @@ void dispatch_server() {
     printf("Mensaje: %s\n", buffer);
     free(buffer);
 
+
+    // PCB de prueba --Borrar
     t_PCB* pcb = malloc(sizeof(t_PCB));
-    
-    fetch_instruction(pcb);
+
+    pcb->pid = 123;
+    pcb->process_size = 64;
+    pcb->pc = 0;
+    pcb->page_table_id = 16;
+    pcb->burst_prediction = 3;
+
+    pcb->l_instruc = list_create();
+
+    // NO_OP
+    t_instruc* i_0 = malloc(sizeof(t_instruc));
+    i_0->instruc_cod = 0;
+    i_0->param_1 = 5;
+    list_add(pcb->l_instruc, i_0);
+    // I_O
+    t_instruc* i_1 = malloc(sizeof(t_instruc));
+    i_1->instruc_cod = 1;
+    i_1->param_1 = 3000;
+    list_add(pcb->l_instruc, i_1);
+    // READ
+    t_instruc* i_2 = malloc(sizeof(t_instruc));
+    i_2->instruc_cod = 2;
+    i_2->param_1 = 0;
+    list_add(pcb->l_instruc, i_2);
+    // COPY
+    t_instruc* i_3 = malloc(sizeof(t_instruc));
+    i_3->instruc_cod = 3;
+    i_3->param_1 = 0;
+    i_3->param_2 = 4;
+    list_add(pcb->l_instruc, i_3);
+    // WRITE
+    t_instruc* i_4 = malloc(sizeof(t_instruc));
+    i_4->instruc_cod = 4;
+    i_4->param_1 = 4;
+    i_4->param_2 = 42;  
+    list_add(pcb->l_instruc, i_4);
+    // EXIT
+    t_instruc* i_5 = malloc(sizeof(t_instruc));
+    i_5->instruc_cod = 5;
+    list_add(pcb->l_instruc, i_5);
+    //
+
+    int c = list_size(pcb->l_instruc);
+    printf("List size: %d\n", c);
+    for(int i=0; i<c; i++) {
+        fetch_instruction(pcb);
+    }
 
 }
 

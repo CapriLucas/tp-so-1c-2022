@@ -1,5 +1,19 @@
 #include "init.h"
 
+
+void inicializar_proceso() {
+
+    // CPU log
+    log_CPU = log_create("./logs/cpu.log", "CPU", true, LOG_LEVEL_INFO);
+    
+    // CPU config
+    config_CPU = malloc(sizeof(t_config_CPU));
+    if (!cargar_configuracion(config_CPU, log_CPU)) {
+        exit(EXIT_FAILURE);
+    }
+}
+
+
 void cerrar_programa() {
 
     // Sockets
