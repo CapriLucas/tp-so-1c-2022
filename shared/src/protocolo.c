@@ -58,3 +58,99 @@ void eliminar_paquete(t_paquete* paquete){
 	free(paquete->buffer);
 	free(paquete);
 }
+
+
+// Serializa estructura t_instruc
+void* serialize_instruc(t_instruc* instruc) {
+    
+    void* stream = malloc(sizeof(t_instruc));
+    size_t offset = 0;
+
+    memcpy(stream+offset, &(instruc->instruc_cod), sizeof(t_instruc));
+    offset += sizeof(instruc);
+    memcpy(stream+offset, &(instruc->param_1), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream+offset, &(instruc->param_2), sizeof(uint32_t));
+
+    return stream;
+
+}
+
+
+// Deserializa estructura t_instruc
+void deserialize_instruc(void* stream, t_instruc* instruc) {
+
+    memcpy(&(instruc->instruc_cod), stream, sizeof(t_instruc));
+    stream += sizeof(instruc);
+    memcpy(&(instruc->param_1), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(instruc->param_2), stream, sizeof(uint32_t));
+
+}
+
+
+// Serializa estructura t_PCB (y su respectiva estructura t_instruc)
+void* serialize_pcb(t_PCB* pcb) {
+
+    int size_list = list_size(pcb->l_instruc);
+    void* stream = malloc(sizeof(t_PCB) + (sizeof(t_instruc) * size_list));
+    size_t offset = 0;
+
+    memcpy(stream+offset, &(pcb->pid), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream+offset, &(pcb->process_size), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream+offset, &(pcb->pc), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream+offset, &(pcb->page_table_id), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+    memcpy(stream+offset, &(pcb->burst_prediction), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    t_instruc* instruc = malloc(sizeof(t_instruc));
+    for (int i = 0; i < size_list; i++) {
+        
+        instruc = list_get(pcb->l_instruc, i);
+        void* aux = serialize_instruc(instruc);
+        memcpy(stream+offset, aux, sizeof(t_instruc));
+        offset += sizeof(t_instruc);
+    
+    }
+    free(instruc);
+
+    return stream;
+}
+
+
+// Deserializa estructura t_PCB (y su respectiva estructura t_instruc)
+void deserialize_pcb(void* stream, t_PCB* pcb) {
+
+    int size_stream = 60;
+    int size_list = (size_stream - sizeof(t_PCB)) / sizeof(t_instruc);    
+    printf("Cantidad elementos: %d\n", size_list);
+
+    memcpy(&(pcb->pid), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(pcb->process_size), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(pcb->pc), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(pcb->page_table_id), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(pcb->burst_prediction), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    pcb->l_instruc = list_create(); 
+    t_instruc* aux = malloc(sizeof(t_instruc));
+    for (int i = 0; i < size_list; i++) {
+
+        t_instruc* instruc = malloc(sizeof(t_instruc));
+        memcpy(aux, stream, sizeof(t_instruc));
+        deserialize_instruc(aux, instruc);
+        list_add(pcb->l_instruc, instruc);
+        stream += sizeof(t_instruc);
+        
+    }
+    free(aux);
+
+}
