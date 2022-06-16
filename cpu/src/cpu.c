@@ -10,10 +10,10 @@ int fetch_instruction (t_PCB* pcb) {
     switch (instruc->instruc_cod) {
         
         case NO_OP:
-            exec_no_op(pcb, instruc);
+            exec_no_op();
             break;
         case I_O:
-            exec_i_o(pcb, instruc);
+            exec_i_o(pcb, instruc->param_1);    // param_1: tiempo de bloqueo en ms.
             break;
         case READ:
             exec_read(pcb, instruc);
@@ -25,7 +25,7 @@ int fetch_instruction (t_PCB* pcb) {
             exec_write(pcb, instruc);
             break;
         case EXIT:
-            exec_exit(pcb, instruc);
+            exec_exit(pcb);
             break;
 
     }
@@ -86,18 +86,21 @@ void dispatch_server() {
     t_instruc* i_0 = malloc(sizeof(t_instruc));
     i_0->instruc_cod = 0;
     i_0->param_1 = 5;
+    i_0->param_2 = 987654321;
     list_add(pcb->l_instruc, i_0);
     // I_O
     t_instruc* i_1 = malloc(sizeof(t_instruc));
     i_1->instruc_cod = 1;
     i_1->param_1 = 3000;
+    i_1->param_2 = 123456789;
     list_add(pcb->l_instruc, i_1);
     // READ
     t_instruc* i_2 = malloc(sizeof(t_instruc));
     i_2->instruc_cod = 2;
-    i_2->param_1 = 0;
+    i_2->param_1 = 10;
+    i_2->param_2 = 110;
     list_add(pcb->l_instruc, i_2);
-    // COPY
+/*     // COPY
     t_instruc* i_3 = malloc(sizeof(t_instruc));
     i_3->instruc_cod = 3;
     i_3->param_1 = 0;
@@ -114,7 +117,7 @@ void dispatch_server() {
     i_5->instruc_cod = 5;
     list_add(pcb->l_instruc, i_5);
     //
-
+ */
     int c = list_size(pcb->l_instruc);
     printf("List size: %d\n", c);
     for(int i=0; i<c; i++) {
