@@ -13,7 +13,7 @@ int fetch_instruction (t_PCB* pcb) {
             exec_no_op();
             break;
         case I_O:
-            exec_i_o(pcb, instruc->param_1);    // param_1: tiempo de bloqueo en ms.
+            exec_i_o(pcb, instruc->param_1);    // param_1: tiempo de bloqueo en msec.
             break;
         case READ:
             exec_read(pcb, instruc);

@@ -33,6 +33,15 @@ typedef struct {
 	t_buffer* buffer;
 } t_paquete;
 
+// Message headers KERNEL <-> CPU
+typedef enum {
+	MSG_INTERRUPT,
+	MSG_INTERRUPT_ACK,
+	MSG_EXEC,
+	MSG_I_O,
+	MSG_EXIT
+} message;
+
 typedef enum {
 	NO_OP,
 	I_O,
@@ -57,6 +66,10 @@ typedef struct {
 	t_list*     l_instruc;					// Lista de instrucciones a ejecutar
 } t_PCB;
 
+typedef struct {
+	uint8_t		message;
+	uint32_t	payload_size;
+} t_header;
 
 t_paquete* crear_paquete(op_code codigo_operacion);
 void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);
@@ -64,13 +77,35 @@ void enviar_paquete(t_paquete* paquete, int socket_cliente);
 void eliminar_paquete(t_paquete* paquete);
 bool send_codigo_op(int fd, op_code cop);
 
+// INSTRUCTIONS
 // Serializa estructura t_instruc
 void* serialize_instruc(t_instruc* instruc);
 // Deserializa estructura t_instruc
 void deserialize_instruc(void* stream, t_instruc* instruc);
+
+// PCB
 // Serializa estructura t_PCB (y su respectiva estructura t_instruc)
 void* serialize_pcb(t_PCB* pcb);
 // Deserializa estructura t_PCB (y su respectiva estructura t_instruc)
-void deserialize_pcb(void* stream, t_PCB* pcb);
+void deserialize_pcb(void* stream, t_PCB* pcb, size_t size);
+
+// EXEC MSG
+// Serializa mensaje EXEC (Kernel -> CPU)
+void* serialize_msg_exec(t_PCB* pcb);
+// Deserializa mensaje EXEC (Kernel -> CPU)
+void deserialize_msg_exec(void* stream, t_header* header, t_PCB* pcb);
+
+// I/O MSG
+// Serializa mensaje I/O (CPU -> Kernel)
+void* serialize_msg_i_o(uint32_t msec, t_PCB* pcb); 
+// Deserializa mensaje I/O (CPU -> Kernel)
+void deserialize_msg_i_o(void* stream, t_header* header, uint32_t* msec, t_PCB* pcb);
+
+// EXIT MSG
+// Serializa mensaje EXIT (CPU -> Kernel)
+void* serialize_msg_exit(t_PCB* pcb);
+// Deserializa mensaje EXIT (CPU -> Kernel)
+void deserialize_msg_exit(void* stream, t_header* header, t_PCB* pcb);
+
 
 #endif
