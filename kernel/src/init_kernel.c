@@ -72,3 +72,27 @@ uint8_t cargar_configuracion(t_config_kernel* config, t_log* mainLog) {
 
     return 1;
 }
+
+t_list* LISTA_NEW;
+t_list* LISTA_READY;
+t_list* LISTA_EXIT;
+t_list* LISTA_EXIT_PID;
+
+void initializeLists(){
+    LISTA_NEW = list_create();
+    LISTA_READY = list_create();
+    LISTA_EXIT = list_create();
+    LISTA_EXIT_PID = list_create();
+}
+
+void initializeKernel(){
+    mainLog = log_create("./logs/kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+    next_pid = 0;
+    mainConfig = malloc(sizeof(t_config_kernel));
+    if (!cargar_configuracion(mainConfig, mainLog) || !crear_servidor(mainConfig, mainLog, &server_fd, SERVERNAME)){
+        liberar_conexion(&server_fd);
+        exit(EXIT_FAILURE);
+    }
+    initializeSemaphores();
+    initializeLists();
+}

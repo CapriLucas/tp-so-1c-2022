@@ -15,7 +15,7 @@
 #include "protocolo.h"
 #include "shared_utils.h"
 
-void enviarInstrucciones(char* texto_crudo,int kernelFd);
+void enviarInstrucciones(char* texto_crudo,int kernelFd, uint32_t memory_size);
 
 
 #endif
