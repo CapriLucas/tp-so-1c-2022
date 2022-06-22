@@ -1,12 +1,12 @@
 #include "cpu.h"
 
 
-int fetch_instruction (t_PCB* pcb) {
+int fetch_instruction (t_PCB* pcb) {    // Cambiar por execute_instruction
 
     t_instruc* instruc = malloc(sizeof(t_instruc));    
     instruc = list_get(pcb->l_instruc, pcb->pc);
     pcb->pc++;
-
+    // Testear PC aumenta
     switch (instruc->instruc_cod) {
         
         case NO_OP:
@@ -61,15 +61,8 @@ void dispatch_server() {
         cerrar_programa();
         exit(EXIT_FAILURE);
     }
-/* 
-    // Test thread & dispatch message from kernel. -- Borrar
-    printf("Estoy dentro del hilo dispatch.\n");
-    char* buffer = malloc(14);
-    int recv_bytes = recv(kernelDispatchFd, buffer, 13, 0);
-    buffer[recv_bytes] = '\0';
-    printf("Mensaje: %s\n", buffer);
-    free(buffer);
-    //  */
+
+    // while (1)  { recv(PCB) hasta final de for
 
     // PCB de prueba --Borrar
     t_PCB* pcb = malloc(sizeof(t_PCB));
@@ -119,10 +112,27 @@ void dispatch_server() {
     i_5->param_2 = 0;  
     list_add(pcb->l_instruc, i_5);
     //
+
+    /*
+    
+    fetch input: PCB; output: t_instruc 
+
+    */
  
     int c = list_size(pcb->l_instruc);
     printf("List size: %d\n", c);
     for(int i = 0; i < c; i++) {
+        // t_instruc* instruc = fetch_instruction(pcb);
+        // datos para copy = fetch_operands(instruc)
+        // bool is_
+     /*    bool desalojar = execute_instruction(instruc);  // execute_instruction pc++
+        if(desalojar) {
+            break;
+        }
+        if(interrupt) {
+            return_pcb(pcb); // o return_interrupt(pcb) ...
+            break;
+        } */
         fetch_instruction(pcb);
     }
 
