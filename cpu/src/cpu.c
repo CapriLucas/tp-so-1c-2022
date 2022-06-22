@@ -1,7 +1,7 @@
 #include "cpu.h"
 
 
-int fetch_instruction (t_PCB* pcb) {  
+int fetch_instruction (t_PCB* pcb) {
 
     t_instruc* instruc = malloc(sizeof(t_instruc));    
     instruc = list_get(pcb->l_instruc, pcb->pc);
@@ -52,7 +52,7 @@ void dispatch_server() {
 
     // Esperar conexión de KERNEL para mensajes de dispatch
     kernelDispatchFd = esperar_cliente (
-        log_CPU, 
+        log_CPU,
         "KERNEL", 
         cpuDispatchFd
     );
@@ -61,7 +61,7 @@ void dispatch_server() {
         cerrar_programa();
         exit(EXIT_FAILURE);
     }
-
+/* 
     // Test thread & dispatch message from kernel. -- Borrar
     printf("Estoy dentro del hilo dispatch.\n");
     char* buffer = malloc(14);
@@ -69,7 +69,7 @@ void dispatch_server() {
     buffer[recv_bytes] = '\0';
     printf("Mensaje: %s\n", buffer);
     free(buffer);
-
+    //  */
 
     // PCB de prueba --Borrar
     t_PCB* pcb = malloc(sizeof(t_PCB));
@@ -84,43 +84,45 @@ void dispatch_server() {
 
     // NO_OP
     t_instruc* i_0 = malloc(sizeof(t_instruc));
-    i_0->instruc_cod = 0;
+    i_0->instruc_cod = NO_OP;
     i_0->param_1 = 5;
     i_0->param_2 = 987654321;
     list_add(pcb->l_instruc, i_0);
     // I_O
     t_instruc* i_1 = malloc(sizeof(t_instruc));
-    i_1->instruc_cod = 1;
+    i_1->instruc_cod = I_O;
     i_1->param_1 = 3000;
     i_1->param_2 = 123456789;
     list_add(pcb->l_instruc, i_1);
     // READ
     t_instruc* i_2 = malloc(sizeof(t_instruc));
-    i_2->instruc_cod = 2;
+    i_2->instruc_cod = READ;
     i_2->param_1 = 10;
     i_2->param_2 = 110;
     list_add(pcb->l_instruc, i_2);
-/*     // COPY
+    // COPY
     t_instruc* i_3 = malloc(sizeof(t_instruc));
-    i_3->instruc_cod = 3;
+    i_3->instruc_cod = COPY;
     i_3->param_1 = 0;
     i_3->param_2 = 4;
     list_add(pcb->l_instruc, i_3);
     // WRITE
     t_instruc* i_4 = malloc(sizeof(t_instruc));
-    i_4->instruc_cod = 4;
+    i_4->instruc_cod = WRITE;
     i_4->param_1 = 4;
     i_4->param_2 = 42;  
     list_add(pcb->l_instruc, i_4);
-    // EXIT
+    //EXIT
     t_instruc* i_5 = malloc(sizeof(t_instruc));
-    i_5->instruc_cod = 5;
+    i_5->instruc_cod = EXIT;
+    i_5->param_1 = 0;
+    i_5->param_2 = 0;  
     list_add(pcb->l_instruc, i_5);
     //
- */
+ 
     int c = list_size(pcb->l_instruc);
     printf("List size: %d\n", c);
-    for(int i=0; i<c; i++) {
+    for(int i = 0; i < c; i++) {
         fetch_instruction(pcb);
     }
 
@@ -154,13 +156,55 @@ void interrupt_server() {
         exit(EXIT_FAILURE);
     }
 
-    // Test thread & interrupt message from kernel. -- Borrar
+/* 
+    // Test recv PCB from Kernel -- Borrar
+
+    void* header_test = malloc(sizeof(uint8_t) + sizeof(uint32_t));
+    uint8_t message_test;
+    uint32_t payload_size_test;
+    recv(kernelDispatchFd, header_test, sizeof(uint8_t) + sizeof(uint32_t), 0);
+    deserialize_header(header_test, &message_test, &payload_size_test);
+    free(header_test);
+
+    printf("Header post-serialización:\n");
+    printf("header->message %u\n", message_test);
+    printf("header->payload_size %u\n", payload_size_test);
+
+    // Recibe y deserializa payload
+    t_PCB* pcb_test = malloc(sizeof(t_PCB));
+    void* stream_test = malloc(payload_size_test);
+    recv(kernelDispatchFd, stream_test, payload_size_test, 0);
+    deserialize_msg_exit(stream_test, payload_size_test, pcb_test);
+    free(stream_test);
+
+    printf("\nPCB post-serialización\n");
+    printf("pcb->pid: %u\n", pcb_test->pid);
+    printf("pcb_aux->process_size: %u\n", pcb_test->process_size);
+    printf("pcb_aux->pc: %u\n", pcb_test->pc);
+    printf("pcb_aux->page_table_id: %u\n", pcb_test->page_table_id);
+    printf("pcb_aux->burst_prediction: %u\n\n", pcb_test->burst_prediction);
+
+    printf("\nInstruc post-serialización\n");
+    t_instruc* instruc_test = malloc(sizeof(t_instruc));
+    size_t size_list_test = list_size(pcb_test->l_instruc);
+    for (int i = 0; i < size_list_test; i++) {
+        printf("Dentro del for\n");
+        instruc_test = list_get(pcb_test->l_instruc, i);
+        printf("instruc_cod: %u\n", instruc_test->instruc_cod);
+        printf("param_1: %u\n", instruc_test->param_1);
+        printf("param_2: %u\n", instruc_test->param_2);
+    }
+
+ */
+    //
+
+/*     // Test thread & interrupt message from kernel. -- Borrar
     printf("Estoy dentro del hilo interrupt.\n");
     char* buffer = malloc(15);
     int recv_bytes = recv(kernelInterruptFd, buffer, 14, 0);
     buffer[recv_bytes] = '\0';
     printf("Mensaje: %s\n", buffer);
-    free(buffer);
+    free(buffer); */
 
 }
 
@@ -177,8 +221,7 @@ int main(){
     printf("IP_MEMORIA: %s\n", config_CPU->IP_MEMORIA);
     printf("PUERTO_MEMORIA: %u\n", config_CPU->PUERTO_MEMORIA);
     printf("PUERTO_ESCUCHA_DISPATCH: %u\n", config_CPU->PUERTO_ESCUCHA_DISPATCH);
-    printf("PUERTO_ESCUCHA_INTERRUPT: %u\n", config_CPU->PUERTO_ESCUCHA_INTERRUPT);
-
+    printf("PUERTO_ESCUCHA_INTERRUPT: %u\n", config_CPU->PUERTO_ESCUCHA_INTERRUPT); 
     
     // Crear conexión con MEMORIA 
     memoriaFd = crear_conexion (
@@ -193,15 +236,6 @@ int main(){
         return EXIT_FAILURE;
     }
 
-    // Thread en que escuchará los mensajes de dispatch enviados por KERNEL
-    pthread_t THREAD_DISPATCH;
-    if (!pthread_create(&THREAD_DISPATCH, NULL, (void*) dispatch_server, NULL))
-        pthread_detach(THREAD_DISPATCH);
-    else {
-        cerrar_programa();
-        return EXIT_FAILURE;
-    }
-
     // Thread en que escuchará los mensajes de INTERRUPT enviados por KERNEL
     pthread_t THREAD_INTERRUPT;
     if (!pthread_create(&THREAD_INTERRUPT, NULL, (void*) interrupt_server, NULL))
@@ -210,6 +244,15 @@ int main(){
         cerrar_programa();
         return EXIT_FAILURE;
     }  
+
+    // Thread en que escuchará los mensajes de dispatch enviados por KERNEL
+    pthread_t THREAD_DISPATCH;
+    if (!pthread_create(&THREAD_DISPATCH, NULL, (void*) dispatch_server, NULL))
+        pthread_detach(THREAD_DISPATCH);
+    else {
+        cerrar_programa();
+        return EXIT_FAILURE;
+    }
 
     for(;;);
 

@@ -14,4 +14,13 @@
 #include "protocolo.h"
 #include "shared_utils.h"
 
+
+t_log* log_Memoria;
+t_config_Memoria* config_Memoria;
+
+int memoriaFd;
+int kernelFd;
+int cpuFd;
+
+
 #endif

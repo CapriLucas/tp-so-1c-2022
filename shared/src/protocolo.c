@@ -59,6 +59,36 @@ void eliminar_paquete(t_paquete* paquete){
 	free(paquete);
 }
 
+
+/*
+ *		HEADER 
+ */
+
+// Serializa header
+void* serialize_header(uint8_t message, uint32_t payload_size) {
+    
+    void* stream = malloc(sizeof(uint8_t) + sizeof(uint32_t));
+    size_t offset = 0;
+
+    memcpy(stream+offset, &message, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+    memcpy(stream+offset, &payload_size, sizeof(uint32_t));
+   
+    return stream;
+
+}
+
+
+// Deserializa header
+void deserialize_header(void* stream, uint8_t* message, uint32_t* payload_size) {
+
+    memcpy(message, stream, sizeof(uint8_t));
+    stream += sizeof(uint8_t);
+    memcpy(payload_size, stream, sizeof(uint32_t));
+
+}
+
+
 /*
  *		INSTRUCTIONS 
  */
@@ -90,6 +120,7 @@ void deserialize_instruc(void* stream, t_instruc* instruc) {
     memcpy(&(instruc->param_2), stream, sizeof(uint32_t));
 
 }
+
 
 /*
  *		PCB
@@ -131,7 +162,7 @@ void* serialize_pcb(t_PCB* pcb) {
 // Deserializa estructura t_PCB (y su respectiva estructura t_instruc)
 void deserialize_pcb(void* stream, t_PCB* pcb, size_t size) {
 
-    int size_list = (size - sizeof(t_PCB)) / sizeof(t_instruc);    
+    int size_list = (size - sizeof(t_PCB)) / sizeof(t_instruc);
 
     memcpy(&(pcb->pid), stream, sizeof(uint32_t));
     stream += sizeof(uint32_t);
@@ -168,18 +199,19 @@ void deserialize_pcb(void* stream, t_PCB* pcb, size_t size) {
 // Serializa mensaje EXEC (Kernel -> CPU)
 void* serialize_msg_exec(t_PCB* pcb) {
 
-    t_header* header = malloc(sizeof(t_header));
-    header->message = MSG_EXEC;
-    header->payload_size = sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
+	uint8_t message = MSG_EXEC;
+    // Payload size = PCB + lista de instrucciones
+    uint32_t payload_size = sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
 
-	void* stream = malloc(sizeof(t_header) + header->payload_size);
+    // Stream = Header (Message + Payload size) + Payload (PCB + lista de instrucciones)
+	void* stream = malloc(sizeof(uint8_t) + sizeof(uint32_t) + payload_size);
 	size_t offset = 0;
 
-    memcpy(stream+offset, &(header->message), sizeof(uint8_t));
+    memcpy(stream+offset, &message, sizeof(uint8_t));
     offset += sizeof(uint8_t);
-    memcpy(stream+offset, &(header->payload_size), sizeof(uint32_t));
+    memcpy(stream+offset, &payload_size, sizeof(uint32_t));
     offset += sizeof(uint32_t);
-	memcpy(stream+offset, serialize_pcb(pcb), header->payload_size);
+	memcpy(stream+offset, serialize_pcb(pcb), payload_size);
 
     return stream;
 
@@ -187,14 +219,9 @@ void* serialize_msg_exec(t_PCB* pcb) {
 
 
 // Deserializa mensaje EXEC (Kernel -> CPU)
-void deserialize_msg_exec(void* stream, t_header* header, t_PCB* pcb) {
+void deserialize_msg_exec(void* stream, uint32_t payload_size, t_PCB* pcb) {
 
-	memcpy(&(header->message), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-	memcpy(&(header->payload_size), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-
-	deserialize_pcb(stream, pcb, header->payload_size);
+	deserialize_pcb(stream, pcb, payload_size);
 
 }
 
@@ -206,36 +233,33 @@ void deserialize_msg_exec(void* stream, t_header* header, t_PCB* pcb) {
 // Serializa mensaje I/O (CPU -> Kernel)
 void* serialize_msg_i_o(uint32_t msec, t_PCB* pcb) {
 
-    t_header* header = malloc(sizeof(t_header));
-    header->message = MSG_I_O;
-    header->payload_size = sizeof(uint32_t) + sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
+	uint8_t message = MSG_I_O;
+    // Payload size = Miliseconds I/O + PCB + lista de instrucciones
+    uint32_t payload_size = sizeof(uint32_t) + sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
 
-	void* stream = malloc(sizeof(t_header) + header->payload_size);
+    // Stream = Header (Message + Payload size) + Payload (Miliseconds I/O + PCB + lista de instrucciones)
+	void* stream = malloc(sizeof(uint8_t) + sizeof(uint32_t) + payload_size);
 	size_t offset = 0;
 
-    memcpy(stream+offset, &(header->message), sizeof(uint8_t));
+    memcpy(stream+offset, &message, sizeof(uint8_t));
     offset += sizeof(uint8_t);
-    memcpy(stream+offset, &(header->payload_size), sizeof(uint32_t));
+    memcpy(stream+offset, &payload_size, sizeof(uint32_t));
     offset += sizeof(uint32_t);
 	memcpy(stream+offset, &msec, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(stream+offset, serialize_pcb(pcb), header->payload_size);
+	memcpy(stream+offset, serialize_pcb(pcb), payload_size - sizeof(uint32_t));
 
     return stream;
 }
 
 
 // Deserializa mensaje I/O (CPU -> Kernel)
-void deserialize_msg_i_o(void* stream, t_header* header, uint32_t* msec, t_PCB* pcb) {
+void deserialize_msg_i_o(void* stream, uint32_t payload_size, uint32_t* msec, t_PCB* pcb) {
 
-	memcpy(&(header->message), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-	memcpy(&(header->payload_size), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
 	memcpy(msec, stream, sizeof(uint32_t));
     stream += sizeof(uint32_t);
 
-	deserialize_pcb(stream, pcb, header->payload_size);
+	deserialize_pcb(stream, pcb, payload_size - sizeof(uint32_t));
 
 }
 
@@ -247,18 +271,19 @@ void deserialize_msg_i_o(void* stream, t_header* header, uint32_t* msec, t_PCB* 
 // Serializa mensaje EXIT (CPU -> Kernel)
 void* serialize_msg_exit(t_PCB* pcb) {
 
-    t_header* header = malloc(sizeof(t_header));
-    header->message = MSG_EXIT;
-    header->payload_size = sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
+    uint8_t message = MSG_EXIT;
+    // Payload size = PCB + lista de instrucciones
+    uint32_t payload_size = sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
 
-	void* stream = malloc(sizeof(t_header) + header->payload_size);
-	size_t offset = 0;    
+    // Stream = Header (Message + Payload size) + Payload (PCB + lista de instrucciones)
+	void* stream = malloc(sizeof(uint8_t) + sizeof(uint32_t) + payload_size);
+	size_t offset = 0;
 
-    memcpy(stream+offset, &(header->message), sizeof(uint8_t));
+    memcpy(stream+offset, &message, sizeof(uint8_t));
     offset += sizeof(uint8_t);
-    memcpy(stream+offset, &(header->payload_size), sizeof(uint32_t));
+    memcpy(stream+offset, &payload_size, sizeof(uint32_t));
     offset += sizeof(uint32_t);
-	memcpy(stream+offset, serialize_pcb(pcb), header->payload_size);
+	memcpy(stream+offset, serialize_pcb(pcb), payload_size);
 
     return stream;
 
@@ -266,13 +291,8 @@ void* serialize_msg_exit(t_PCB* pcb) {
 
 
 // Deserializa mensaje EXIT (CPU -> Kernel)
-void deserialize_msg_exit(void* stream, t_header* header, t_PCB* pcb) {
+void deserialize_msg_exit(void* stream, uint32_t payload_size, t_PCB* pcb) {
 
-	memcpy(&(header->message), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-	memcpy(&(header->payload_size), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-
-	deserialize_pcb(stream, pcb, header->payload_size);
+	deserialize_pcb(stream, pcb, payload_size);
 
 }

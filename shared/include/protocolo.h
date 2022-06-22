@@ -18,6 +18,7 @@
 //Shared
 #include "shared_utils.h"
 
+
 typedef enum {
 	ENVIAR_PSEUDO_CODIGO,
 	DEBUG_OP_CODE
@@ -66,16 +67,25 @@ typedef struct {
 	t_list*     l_instruc;					// Lista de instrucciones a ejecutar
 } t_PCB;
 
+/* 
+An identifier declared as an enumeration constant has type int
 typedef struct {
 	uint8_t		message;
 	uint32_t	payload_size;
 } t_header;
+ */
 
 t_paquete* crear_paquete(op_code codigo_operacion);
 void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);
 void enviar_paquete(t_paquete* paquete, int socket_cliente);
 void eliminar_paquete(t_paquete* paquete);
 bool send_codigo_op(int fd, op_code cop);
+
+// HEADER
+// Serializa header
+void* serialize_header(uint8_t message, uint32_t payload_size);
+// Deserializa header
+void deserialize_header(void* stream, uint8_t* message, uint32_t* payload_size);
 
 // INSTRUCTIONS
 // Serializa estructura t_instruc
@@ -93,19 +103,19 @@ void deserialize_pcb(void* stream, t_PCB* pcb, size_t size);
 // Serializa mensaje EXEC (Kernel -> CPU)
 void* serialize_msg_exec(t_PCB* pcb);
 // Deserializa mensaje EXEC (Kernel -> CPU)
-void deserialize_msg_exec(void* stream, t_header* header, t_PCB* pcb);
+void deserialize_msg_exec(void* stream, uint32_t payload_size, t_PCB* pcb);
 
 // I/O MSG
 // Serializa mensaje I/O (CPU -> Kernel)
 void* serialize_msg_i_o(uint32_t msec, t_PCB* pcb); 
 // Deserializa mensaje I/O (CPU -> Kernel)
-void deserialize_msg_i_o(void* stream, t_header* header, uint32_t* msec, t_PCB* pcb);
+void deserialize_msg_i_o(void* stream, uint32_t payload_size, uint32_t* msec, t_PCB* pcb);
 
 // EXIT MSG
 // Serializa mensaje EXIT (CPU -> Kernel)
 void* serialize_msg_exit(t_PCB* pcb);
 // Deserializa mensaje EXIT (CPU -> Kernel)
-void deserialize_msg_exit(void* stream, t_header* header, t_PCB* pcb);
+void deserialize_msg_exit(void* stream, uint32_t payload_size, t_PCB* pcb);
 
 
 #endif

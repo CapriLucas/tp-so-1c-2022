@@ -20,7 +20,8 @@ int exec_i_o (t_PCB* pcb, uint32_t msec) {
   
     log_info(log_CPU, "Ejecutando instrucción I/O %u", msec);
 
-    size_t size = sizeof(t_header) + sizeof(t_PCB) + sizeof(uint32_t) +  sizeof(t_instruc) * list_size(pcb->l_instruc);
+    // Size = Header + Milisegundos I/O + PCB + lista de instrucciones
+    size_t size = sizeof(uint8_t) + sizeof(uint32_t) * 2 + sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
 
     void* stream = serialize_msg_i_o(msec, pcb);
 
@@ -71,11 +72,12 @@ int exec_write (t_PCB* pcb, t_instruc* instruc) {
 // Execute EXIT
 int exec_exit (t_PCB* pcb) {
 
-    log_info(log_CPU, "Ejecutando instrucción EXIT");
+    log_info(log_CPU, "Ejecutando instrucción EXIT");  
 
     void* stream = serialize_msg_exit(pcb);
 
-    size_t size = sizeof(t_header) + sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
+    // Size = Header + PCB + lista de instrucciones
+    size_t size = sizeof(uint8_t) + sizeof(uint32_t) + sizeof(t_PCB) + sizeof(t_instruc) * list_size(pcb->l_instruc);
 
     send(kernelDispatchFd, stream, size, 0);
 

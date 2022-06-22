@@ -15,6 +15,7 @@
 
 // Shared
 #include "protocolo.h"
+#include "sockets.h"
 #include "shared_utils.h"
 
 t_config_CPU* config_CPU;
