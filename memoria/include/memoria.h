@@ -5,10 +5,12 @@
 #include <commons/string.h>
 #include <commons/log.h>
 #include <commons/config.h>
+#include <pthread.h>
 #include <stdbool.h>
 
 #include "config.h"
 #include "init.h"
+#include "comunicacion.h"
 
 // Shared
 #include "protocolo.h"

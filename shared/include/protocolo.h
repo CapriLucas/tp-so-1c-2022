@@ -18,7 +18,8 @@
 
 typedef enum {
 	ENVIAR_PSEUDO_CODIGO,
-	DEBUG_OP_CODE
+	DEBUG_OP_CODE,
+	CREAR_PROCESO_EN_MEMORIA
 } op_code;
 
 typedef struct {
@@ -55,6 +56,10 @@ typedef struct {
     uint32_t    burst_prediction;           // Estimación para planificación bajo algoritmo SRT
 } t_PCB;
 
+typedef struct {
+    uint32_t    pid;                        // Process ID - Identificador del proceso
+    uint32_t    process_size;               // Tamaño en bytes del proceso
+} t_creacion_memoria;
 
 t_paquete* crear_paquete(op_code codigo_operacion);
 void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);
