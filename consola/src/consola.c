@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 
 
     // Envía instrucciones
-    enviarInstrucciones(texto_crudo, kernelFd);
+    enviarInstrucciones(texto_crudo, kernelFd, cmd.MEMORY_SIZE);
 
 
     // Espera por finalización (mensaje EXIT por parte de Kernel)
