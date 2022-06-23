@@ -77,12 +77,14 @@ t_list* LISTA_NEW;
 t_list* LISTA_READY;
 t_list* LISTA_EXIT;
 t_list* LISTA_EXIT_PID;
+t_list* LISTA_BLOCKED;
 
 void initializeLists(){
     LISTA_NEW = list_create();
     LISTA_READY = list_create();
     LISTA_EXIT = list_create();
     LISTA_EXIT_PID = list_create();
+    LISTA_BLOCKED = list_create();
 }
 
 void initializeKernel(){
