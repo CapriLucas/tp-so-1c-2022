@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 
+#include "global.h"
 #include "config.h"
 #include "init.h"
 #include "dispatch.h"
@@ -17,14 +18,5 @@
 #include "protocolo.h"
 #include "sockets.h"
 #include "shared_utils.h"
-
-t_config_CPU* config_CPU;
-t_log* log_CPU;
-
-int memoriaFd;
-int cpuDispatchFd;
-int kernelDispatchFd;
-int cpuInterruptFd;
-int kernelInterruptFd;
 
 #endif

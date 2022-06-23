@@ -11,9 +11,9 @@ typedef struct {
 } t_procesar_conexion_args;
 
 
-const char* get_instruction_name(instruccion_cod instruccion_cod) {
+const char* get_instruction_name(instruccion_cod instruc_cod) {
 
-	switch(instruccion_cod) {
+	switch(instruc_cod) {
 		case NO_OP:		return "NO_OP";
 		case I_O: 		return "I/O";
 		case READ:		return "READ";
@@ -24,7 +24,7 @@ const char* get_instruction_name(instruccion_cod instruccion_cod) {
 	}
 }
 
-procesar_instruccion(t_instruccion* instruccion, int client_fd, t_log* logger) {
+void procesar_instruccion(t_instruccion* instruccion, int client_fd, t_log* logger) {
 
     log_info(logger,"Size: %d\nCódigo instrucción: %s\nParámetro 1: %d\nParámetro 2: %d\n", 
         8,      // Memory size
@@ -38,7 +38,6 @@ procesar_instruccion(t_instruccion* instruccion, int client_fd, t_log* logger) {
         liberar_conexion(&client_fd);
     }    
 }
-
 
 
 
@@ -63,25 +62,6 @@ static t_instruccion* recibir_instruccion (void* stream, uint16_t posicion){
     return instruccion;
 }
 
-static uint8_t recibir_header(t_paquete* paquete, int cliente_socket, t_log* logger){
-    paquete->buffer = malloc(sizeof(t_buffer));
-
-    if(recv(cliente_socket, &(paquete->codigo_operacion), sizeof(op_code), 0) == 0) {
-        log_info(logger,"DISCONNECTED!!!");
-        return 0;
-    }
-    if(paquete->codigo_operacion != ENVIAR_PSEUDO_CODIGO){
-        log_info(logger,"El kernel server solo admite instrucciones");
-        return 0;
-    }
-
-    recv(cliente_socket, &(paquete->buffer->size), sizeof(uint32_t), 0);
-    paquete->buffer->stream = malloc(paquete->buffer->size);
-    recv(cliente_socket, paquete->buffer->stream, paquete->buffer->size, 0);
-
-    return 1;
-}
-
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     int cliente_socket = args->fd;
@@ -91,7 +71,11 @@ static void procesar_conexion(void* void_args) {
 
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
-    if(recibir_header(paquete, cliente_socket, logger) == 0){
+    if(recibir_header(paquete, cliente_socket) == 0){
+        return;
+    }
+    if(paquete->codigo_operacion != ENVIAR_PSEUDO_CODIGO){
+        log_info(logger,"El kernel server solo admite instrucciones");
         return;
     }
 
@@ -99,7 +83,6 @@ static void procesar_conexion(void* void_args) {
         t_instruccion* instruccion = recibir_instruccion(paquete->buffer->stream, pos);       
 
         procesar_instruccion(instruccion, cliente_socket, logger);
-
 
     }
     eliminar_paquete(paquete);

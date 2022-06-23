@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include "comunicacion.h"
+#include "protocolo.h"
 #include "init_kernel.h"
 #include "shared_utils.h"
 
