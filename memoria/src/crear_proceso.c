@@ -5,7 +5,7 @@ t_creacion_memoria* recibir_mensaje (void* stream);
 void crear_proceso(t_paquete* paquete){
 
     t_creacion_memoria* datos_creacion = recibir_mensaje(paquete->buffer->stream);
-    log_info(mainLog, "Pid: %d\n\nProcess_size:%d",datos_creacion->pid,datos_creacion->process_size);
+    log_info(log_Memoria, "Pid: %d\n\nProcess_size:%d",datos_creacion->pid,datos_creacion->process_size);
     // TODO Implementar logica aca
     // Retornamos dato mockeado
     uint32_t page_table_id = 3;

@@ -8,6 +8,7 @@ typedef struct {
     int  fd;
 } t_procesar_conexion_args;
 
+
 static uint32_t recibir_memory_size(void* stream) {
     uint32_t process_memory_size;
 
@@ -36,25 +37,6 @@ static t_instruccion* recibir_instruccion (void* stream, uint16_t posicion){
     return instruccion;
 }
 
-static uint8_t recibir_header(t_paquete* paquete, int cliente_socket){
-    paquete->buffer = malloc(sizeof(t_buffer));
-
-    if(recv(cliente_socket, &(paquete->codigo_operacion), sizeof(op_code), 0) == 0) {
-        log_info(mainLog, "DISCONNECTED!!!");
-        return 0;
-    }
-    if(paquete->codigo_operacion != ENVIAR_PSEUDO_CODIGO){
-        log_info(mainLog, "El kernel server solo admite instrucciones");
-        return 0;
-    }
-
-    recv(cliente_socket, &(paquete->buffer->size), sizeof(uint32_t), 0);
-    paquete->buffer->stream = malloc(paquete->buffer->size);
-    recv(cliente_socket, paquete->buffer->stream, paquete->buffer->size, 0);
-
-    return 1;
-}
-
 static void procesar_conexion(void* void_args) {
     t_procesar_conexion_args* args = (t_procesar_conexion_args*) void_args;
     int cliente_socket = args->fd;
@@ -66,6 +48,10 @@ static void procesar_conexion(void* void_args) {
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
     if(recibir_header(paquete, cliente_socket) == 0){
+        return;
+    }
+    if(paquete->codigo_operacion != ENVIAR_PSEUDO_CODIGO){
+        log_info(mainLog, "El kernel server solo admite instrucciones");
         return;
     }
 

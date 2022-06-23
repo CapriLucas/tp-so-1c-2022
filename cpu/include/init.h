@@ -8,15 +8,17 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 
+#include "global.h"
 #include "config.h"
+#include "cpu.h"
 
 // Shared
 #include "sockets.h"
 #include "shared_utils.h"
 
-
+void inicializar_proceso();
 uint8_t cargar_configuracion(t_config_CPU*, t_log*);
 uint8_t generar_conexiones(int*, t_config_CPU*, t_log*);
-void cerrar_programa(t_config_CPU*, t_log*, int*);
+void cerrar_programa();
 
 #endif

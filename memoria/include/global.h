@@ -8,8 +8,8 @@
 #include "config.h"
 
 //Global variables
-extern t_log* mainLog;
-extern t_config_Memoria* mainConfig;
+extern t_log* log_Memoria;
+extern t_config_Memoria* config_Memoria;
 
 // File descriptors
 extern int kernelFd;

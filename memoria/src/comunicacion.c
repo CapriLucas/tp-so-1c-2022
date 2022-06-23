@@ -5,7 +5,7 @@ uint8_t recibir_header(t_paquete* paquete);
 void handler_kernel(){
     // Esperar conexión de Kernel
     kernelFd = esperar_cliente (
-        mainLog, 
+        log_Memoria, 
         "MEMORIA", 
         memoriaFd
     );
@@ -29,7 +29,7 @@ uint8_t recibir_header(t_paquete* paquete){
     paquete->buffer = malloc(sizeof(t_buffer));
 
     if(recv(kernelFd, &(paquete->codigo_operacion), sizeof(op_code), 0) == 0) {
-        log_info(mainLog, "DISCONNECTED!!!");
+        log_info(log_Memoria, "DISCONNECTED!!!");
         return 0;
     }
 
