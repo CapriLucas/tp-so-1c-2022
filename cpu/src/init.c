@@ -1,19 +1,39 @@
 #include "init.h"
 
-void cerrar_programa(t_config_CPU* cfg, t_log* mainLog, int* memoriaFd) {
 
-    log_destroy(mainLog);
+void inicializar_proceso() {
 
-    if (memoriaFd) {   // NOT NULL
-        liberar_conexion(memoriaFd);
-    }   
+    // CPU log
+    log_CPU = log_create("./logs/cpu.log", "CPU", true, LOG_LEVEL_INFO);
     
-    free(cfg->REEMPLAZO_TLB);
-    free(cfg->IP_MEMORIA);
-    free(cfg);
+    // CPU config
+    config_CPU = malloc(sizeof(t_config_CPU));
+    if (!cargar_configuracion(config_CPU, log_CPU)) {
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+void cerrar_programa() {
+
+    // Sockets
+    if (memoriaFd) { liberar_conexion(&memoriaFd); }   
+    if (cpuDispatchFd) { liberar_conexion(&cpuDispatchFd); }   
+    if (kernelDispatchFd) { liberar_conexion(&kernelDispatchFd); }   
+    if (cpuInterruptFd) { liberar_conexion(&cpuInterruptFd); }   
+    if (kernelInterruptFd) { liberar_conexion(&kernelInterruptFd); }   
+
+    // CPU config    
+    free(config_CPU->REEMPLAZO_TLB);
+    free(config_CPU->IP_MEMORIA);
+    free(config_CPU);
+
+    // CPU log
+    log_destroy(log_CPU);
 
     rl_clear_history();
 }
+
 
 uint8_t cargar_configuracion(t_config_CPU* config, t_log* mainLog) {
     t_config* cfg = config_create("./cfg/cpu.config");

@@ -15,6 +15,7 @@ typedef struct {
 
 } t_config_CPU;
 
+
 /*
     Ejemplo de archivo de configuración
 
