@@ -18,6 +18,7 @@
 
 typedef enum {
 	ENVIAR_PSEUDO_CODIGO,
+	CREAR_PROCESO_EN_MEMORIA,
 	MSG_INTERRUPT,				// INTERRUPT message from KERNEL to CPU :: ()
 	MSG_INTERRUPT_ACK,			// INTERRUPT ACKNOWLEDGEMENT message from CPU to KERNEL :: (PCB)
 	MSG_EXEC,					// EXECUTE message from KERNEL to CPU :: (PCB)
@@ -59,6 +60,11 @@ typedef struct {
     uint32_t    burst_prediction;           // Estimación para planificación bajo algoritmo SRT
 	t_list*     instructions_list;			// Lista de instrucciones a ejecutar
 } t_PCB;
+
+typedef struct {
+    uint32_t    pid;                        // Process ID - Identificador del proceso
+    uint32_t    process_size;               // Tamaño en bytes del proceso
+} t_creacion_memoria;
 
 t_paquete* crear_paquete(op_code codigo_operacion);
 void agregar_a_paquete(t_paquete* paquete, void* valor, uint32_t tamanio);

@@ -1,5 +1,12 @@
 #include "memoria.h"
 
+t_log* log_Memoria;
+t_config_Memoria* config_Memoria;
+int memoriaFd;
+int kernelFd;
+int cpuFd;
+
+
 int main(){
 
     inicializar_proceso();
@@ -34,36 +41,16 @@ int main(){
         "CPU", 
         memoriaFd
     );
-
-    if (!cpuFd) {
-        cerrar_programa();
-        exit(EXIT_FAILURE);
+    
+    pthread_t THREAD_KERNEL_LISTENER;
+    if(!pthread_create(&THREAD_KERNEL_LISTENER, NULL, (void*) handler_kernel, NULL))
+        pthread_detach(THREAD_KERNEL_LISTENER);
+    else {
+        log_error(log_Memoria, "ERROR CRITICO INICIANDO EL LISTENER DEL KERNEL. ABORTANDO.");
+        return EXIT_FAILURE;
     }
-
-
-    // Esperar conexión de Kernel
-    kernelFd = esperar_cliente (
-        log_Memoria, 
-        "KERNEL", 
-        memoriaFd
-    );
-
-    if (!kernelFd) {
-        cerrar_programa();
-        exit(EXIT_FAILURE);
-    }
-
-
-    // Test recv msg from CPU (READ, WRITE, COPY) -- Borrar
-    char* buffer = malloc(5);
-    int recv_bytes = recv(cpuFd, buffer, 5, 0);
-    buffer[recv_bytes] = '\0';
-    printf("Mensaje: %s\n", buffer);
-    free(buffer);  
-    // 
-
-    for (;;);
-
+    
+    while(1);
     cerrar_programa();
 
 }
