@@ -36,6 +36,21 @@ void handler_consola_listener(){
     while(server_escuchar(SERVERNAME, server_fd));
 }
 
+
+uint32_t crear_proceso_en_memoria(uint32_t pid,uint32_t process_size){
+    t_creacion_memoria* mensaje = malloc(sizeof(t_creacion_memoria));
+    mensaje->pid = pid;
+    mensaje->process_size = process_size;
+	t_paquete* paquete = crear_paquete(CREAR_PROCESO_EN_MEMORIA);
+    agregar_a_paquete(paquete, mensaje, sizeof(t_creacion_memoria));
+    //El paquete va a enviar un buffer de size 12
+    enviar_paquete(paquete, memoriaFd);
+    uint32_t page_table_id;
+    recv(memoriaFd, &page_table_id, sizeof(uint32_t), MSG_WAITALL);
+    return page_table_id;
+}
+
+
 // Dependiendo del nivel de multiprogramacion pasa de new a ready. Se lo comunica a memoria
 // Bloqueado por: Cantidad de items en NEW, multiprogramacion disponible
 // Libera: 1 + en items READY
@@ -49,6 +64,10 @@ void handler_new_to_ready(){
             pcb = list_get(LISTA_NEW, 0);
             list_remove(LISTA_NEW, 0);
         pthread_mutex_unlock(&MUTEX_LISTA_NEW);
+
+        uint32_t page_table_id = crear_proceso_en_memoria(pcb->pid, pcb->process_size);
+        log_info(mainLog,"ACAAA %d",page_table_id);
+        //Enviar y recibir valor de tabla de paginas y ponerlo en el pcb
         //TODO enviar a memoria para crear proceso y despues agregarlo a READY
         pthread_mutex_lock(&MUTEX_LISTA_READY);
             list_add(LISTA_READY, pcb);
@@ -74,17 +93,17 @@ void handler_exit(){
 
 //TODO EN CUANTO ESTE EL PLANIFICADOR CORTO PLAZO SACAR ESTO PORFAVOR
 // //EMULADOR PARA PROBAR pasar de ready a exit apenas vayan llegando
-//         t_PCB* pcb;
-//         sem_wait(&CONTADOR_LISTA_READY);
-//         pthread_mutex_lock(&MUTEX_LISTA_READY);
-//             pcb = list_get(LISTA_READY, 0);
-//             list_remove(LISTA_READY, 0);
-//         pthread_mutex_unlock(&MUTEX_LISTA_READY);
-//         pthread_mutex_lock(&MUTEX_LISTA_EXIT);
-//             list_add(LISTA_EXIT, pcb);
-//             log_info(mainLog,"Agregamos a exit el proceso (%d)",pcb->pid);
-//             sem_post(&CONTADOR_LISTA_EXIT);
-//         pthread_mutex_unlock(&MUTEX_LISTA_EXIT);  
+// t_PCB* pcb;
+// sem_wait(&CONTADOR_LISTA_READY);
+// pthread_mutex_lock(&MUTEX_LISTA_READY);
+//     pcb = list_get(LISTA_READY, 0);
+//     list_remove(LISTA_READY, 0);
+// pthread_mutex_unlock(&MUTEX_LISTA_READY);
+// pthread_mutex_lock(&MUTEX_LISTA_EXIT);
+//     list_add(LISTA_EXIT, pcb);
+//     log_info(mainLog,"Agregamos a exit el proceso (%d)",pcb->pid);
+//     sem_post(&CONTADOR_LISTA_EXIT);
+// pthread_mutex_unlock(&MUTEX_LISTA_EXIT);  
 // // ACA EMPIEZA
 
         sem_wait(&CONTADOR_LISTA_EXIT);

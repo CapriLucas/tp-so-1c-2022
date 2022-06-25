@@ -1,21 +1,41 @@
 #include "init.h"
 
-void cerrar_programa(t_config_Memoria* cfg, t_log* mainLog, int* memoriaFd) {
-    log_destroy(mainLog);
+void inicializar_proceso() {
 
-    liberar_conexion(memoriaFd);
-    free(cfg->ALGORITMO_REEMPLAZO);
-    free(cfg->PATH_SWAP);
-    free(cfg);
+    // Memoria log
+    log_Memoria = log_create("./logs/memoria.log", "MEMORIA", true, LOG_LEVEL_INFO);
+
+    // Memoria config
+    config_Memoria = malloc(sizeof(t_config_Memoria));
+    if (!cargar_configuracion(config_Memoria, log_Memoria)) {
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+void cerrar_programa() {
+
+    // Sockets
+    if (memoriaFd) { liberar_conexion(&memoriaFd); }
+    if (kernelFd) { liberar_conexion(&kernelFd); }
+    if (cpuFd) { liberar_conexion(&cpuFd); }
+
+    // Memoria config
+    free(config_Memoria->ALGORITMO_REEMPLAZO);
+    free(config_Memoria->PATH_SWAP);
+    free(config_Memoria);
+
+    // Memoria log
+    log_destroy(log_Memoria);
 
     rl_clear_history();
 }
 
-uint8_t cargar_configuracion(t_config_Memoria* config, t_log* mainLog) {
+uint8_t cargar_configuracion(t_config_Memoria* config, t_log* log_Memoria) {
     t_config* cfg = config_create("./cfg/memoria.config");
 
     if(cfg == NULL) {
-        log_error(mainLog, "No se encontró memoria.config");
+        log_error(log_Memoria, "No se encontró memoria.config");
         return 0;
     }
 
@@ -33,7 +53,7 @@ uint8_t cargar_configuracion(t_config_Memoria* config, t_log* mainLog) {
     };
 
     if(!config_has_all_properties(cfg, properties)) {
-        log_error(mainLog, "Propiedades faltantes en el archivo de configuración");
+        log_error(log_Memoria, "Propiedades faltantes en el archivo de configuración");
         config_destroy(cfg);
         return 0;
     }
@@ -48,7 +68,7 @@ uint8_t cargar_configuracion(t_config_Memoria* config, t_log* mainLog) {
     config->PATH_SWAP = strdup(config_get_string_value(cfg, "PATH_SWAP"));
 
 
-    log_info(mainLog, "Archivo de configuración cargado correctamente");
+    log_info(log_Memoria, "Archivo de configuración cargado correctamente");
 
     config_destroy(cfg);
 

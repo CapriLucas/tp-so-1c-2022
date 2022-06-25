@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 
+#include "global.h"
 #include "config.h"
 #include "init.h"
 #include "dispatch.h"
@@ -15,6 +16,7 @@
 
 // Shared
 #include "protocolo.h"
+#include "sockets.h"
 #include "shared_utils.h"
 
 #endif
