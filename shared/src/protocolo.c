@@ -87,10 +87,8 @@ t_paquete* serialize_msg_exec(t_PCB* pcb) {
     size_t size_list = list_size(pcb->instructions_list);
 
     for(int i = 0;  i < size_list; i++) {
-		t_instruccion* aux = malloc(sizeof(t_instruccion));
-        aux = list_get(pcb->instructions_list, i);
+        t_instruccion* aux = list_get(pcb->instructions_list, i);
         agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
-        free(aux);
 	}
     
     return paquete;
@@ -116,7 +114,6 @@ void deserialize_msg_exec(t_paquete* paquete, t_PCB* pcb) {
         memcpy(aux, stream, sizeof(t_instruccion));
         list_add(pcb->instructions_list, aux);
         stream += sizeof(t_instruccion);
-
     }
 }
 
@@ -184,12 +181,9 @@ t_paquete* serialize_msg_exit(t_PCB* pcb) {
     size_t size_list = list_size(pcb->instructions_list);
 
     for(int i=0;  i < size_list; i++){
-		t_instruccion* aux = malloc(sizeof(t_instruccion));
-        aux = list_get(pcb->instructions_list, i);
+		t_instruccion* aux = list_get(pcb->instructions_list, i);
         agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
-        free(aux);
 	}
-    
     return paquete;
 }
 
@@ -215,4 +209,13 @@ void deserialize_msg_exit(t_paquete* paquete, t_PCB* pcb) {
 
     }
 
+}
+
+static void instructions_destroy(t_instruccion *self) {
+    free(self);
+}
+
+void destroy_pcb(t_PCB* pcb){
+	list_destroy_and_destroy_elements(pcb->instructions_list, (void*) instructions_destroy);
+	free(pcb);
 }

@@ -73,76 +73,38 @@ void dispatch_server() {
         exit(EXIT_FAILURE);
     }
 
-    // while (1)  { recv(PCB) hasta final de for
+    while (1) {
+        t_paquete* paquete = malloc(sizeof(t_paquete));
 
-    // PCB de prueba --Borrar
-    t_PCB* pcb = malloc(sizeof(t_PCB));
-
-    pcb->pid = 123;
-    pcb->process_size = 64;
-    pcb->pc = 0;
-    pcb->page_table_id = 16;
-    pcb->burst_prediction = 3;
-
-    pcb->instructions_list = list_create();
-
-    // NO_OP
-    t_instruccion* i_0 = malloc(sizeof(t_instruccion));
-    i_0->codigo_instruccion = NO_OP;
-    i_0->param_1 = 5;
-    i_0->param_2 = 987654321;
-    list_add(pcb->instructions_list, i_0);
-    // READ
-    t_instruccion* i_2 = malloc(sizeof(t_instruccion));
-    i_2->codigo_instruccion = READ;
-    i_2->param_1 = 10;
-    i_2->param_2 = 110;
-    list_add(pcb->instructions_list, i_2);
-    // COPY
-    t_instruccion* i_3 = malloc(sizeof(t_instruccion));
-    i_3->codigo_instruccion = COPY;
-    i_3->param_1 = 0;
-    i_3->param_2 = 4;
-    list_add(pcb->instructions_list, i_3);
-    // WRITE
-    t_instruccion* i_4 = malloc(sizeof(t_instruccion));
-    i_4->codigo_instruccion = WRITE;
-    i_4->param_1 = 4;
-    i_4->param_2 = 42;  
-    list_add(pcb->instructions_list, i_4);
-     //EXIT
-    t_instruccion* i_5 = malloc(sizeof(t_instruccion));
-    i_5->codigo_instruccion = EXIT;
-    i_5->param_1 = 0;
-    i_5->param_2 = 0;  
-    list_add(pcb->instructions_list, i_5);
-    // I_O
-    t_instruccion* i_1 = malloc(sizeof(t_instruccion));
-    i_1->codigo_instruccion = I_O;
-    i_1->param_1 = 3000;
-    i_1->param_2 = 123456789;
-    list_add(pcb->instructions_list, i_1);
-    //
-
- 
-    size_t size_list = list_size(pcb->instructions_list);
-        
-    for(int i = pcb->pc; i < size_list; i++) {
-
-        t_instruccion* instruc = fetch_instruction(pcb);
-        
-        bool desalojar = exec_instruction(pcb, instruc);
-        if(desalojar) {
-            break;
+        if(recibir_header(paquete, kernelDispatchFd) == 0){
+            return;
         }
-        /*
-        if(interrupt) {
-            return_pcb(pcb); // o return_interrupt(pcb) ...
-            break;
-        } */
-        // datos para copy = fetch_operands(instruc)
+        if(paquete->codigo_operacion != MSG_EXEC){
+            log_info(log_CPU, "Se espera recibir MSG_EXEC codigo de operacion");
+            return;
+        }
+        t_PCB* pcb = malloc(sizeof(t_PCB));
+        deserialize_msg_exec(paquete, pcb);
+    
+        size_t size_list = list_size(pcb->instructions_list);
+        
+        for(int i = pcb->pc; i < size_list; i++) {
+            t_instruccion* instruc = fetch_instruction(pcb);
+            // datos para copy = fetch_operands(instruc)
+            
+            bool desalojar = exec_instruction(pcb, instruc);
+            if(desalojar) {
+                break;
+            }
+            /*
+            if(interrupt) {
+                return_pcb(pcb); // o return_interrupt(pcb) ...
+                break;
+            } */
+        }
+        destroy_pcb(pcb);
+        eliminar_paquete(paquete);
     }
-
 }
 
 

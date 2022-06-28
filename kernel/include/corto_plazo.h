@@ -3,7 +3,14 @@
 
 
 #include "global.h"
+#include "sockets.h"
 #include "protocolo.h"
+#include "dispatcher.h"
+#include <semaphore.h>
+#include <pthread.h>
 
+void handler_corto_plazo();
+void handler_ciclo_corto_plazo();
+void handler_check_ready_list();
 
 #endif
