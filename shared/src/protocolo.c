@@ -211,6 +211,55 @@ void deserialize_msg_exit(t_paquete* paquete, t_PCB* pcb) {
 
 }
 
+/*
+ *		INTERRUPT MSG
+ *      Kernel -> CPU
+ */
+
+t_paquete* serialize_msg_interrupt() {
+
+    t_paquete* paquete = crear_paquete(MSG_INTERRUPT);
+
+    return paquete;
+}
+
+// Serializa mensaje INTERRUPT_ACK (CPU -> Kernel)
+t_paquete* serialize_msg_interrupt_ack(t_PCB* pcb) {
+
+    t_paquete* paquete = crear_paquete(MSG_INTERRUPT_ACK);
+    agregar_a_paquete(paquete, pcb, sizeof(t_PCB));
+
+    size_t size_list = list_size(pcb->instructions_list);
+
+    for(int i=0;  i < size_list; i++){
+		t_instruccion* aux = list_get(pcb->instructions_list, i);
+        agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
+	}
+    return paquete;
+}
+
+// Deserializa mensaje INTERRUPT ACK (CPU -> Kernel)
+void deserialize_msg_interrupt_ack(t_paquete* paquete, t_PCB* pcb) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(pcb, stream, sizeof(t_PCB));
+    stream += sizeof(t_PCB);
+
+    int size_list = (paquete->buffer->size - sizeof(uint32_t) - sizeof(t_PCB)) / (sizeof(t_instruccion) + sizeof(uint32_t));
+    
+    pcb->instructions_list = list_create();
+
+    for(int i = 0; i < size_list; i++) {
+
+        t_instruccion* aux = malloc(sizeof(t_instruccion));
+        stream += sizeof(uint32_t);
+        memcpy(aux, stream, sizeof(t_instruccion));
+        list_add(pcb->instructions_list, aux);
+        stream += sizeof(t_instruccion);
+    }
+}
+
 static void instructions_destroy(t_instruccion *self) {
     free(self);
 }

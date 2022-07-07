@@ -9,6 +9,7 @@ sem_t CONTADOR_LISTA_NEW;
 // -- READY
 pthread_mutex_t MUTEX_LISTA_READY;
 sem_t CONTADOR_LISTA_READY;
+sem_t LISTA_READY_INTERRUPT;
 
 // -- EXIT
 pthread_mutex_t MUTEX_LISTA_EXIT;
@@ -29,6 +30,7 @@ void initializeSemaphores(){
 
     pthread_mutex_init(&MUTEX_LISTA_READY, NULL);
     sem_init(&CONTADOR_LISTA_READY, 0, 0);
+    sem_init(&LISTA_READY_INTERRUPT, 0, 0);
 
     pthread_mutex_init(&MUTEX_LISTA_EXIT, NULL);
     sem_init(&CONTADOR_LISTA_EXIT, 0, 0);

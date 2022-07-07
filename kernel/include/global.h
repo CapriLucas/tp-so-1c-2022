@@ -46,6 +46,7 @@ extern sem_t CONTADOR_LISTA_NEW;
 extern t_list* LISTA_READY;
 extern pthread_mutex_t MUTEX_LISTA_READY;
 extern sem_t CONTADOR_LISTA_READY;
+extern sem_t LISTA_READY_INTERRUPT;
 
 // -- Lista Exit
 extern t_list* LISTA_EXIT;

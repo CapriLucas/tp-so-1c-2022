@@ -70,6 +70,13 @@ void handler_ciclo_corto_plazo(){
                 pthread_mutex_unlock(&MUTEX_LISTA_EXIT);
                 sem_post(&GRADO_MULTIPROGRAMACION);
                 break;
+            case MSG_INTERRUPT_ACK:
+                deserialize_msg_interrupt_ack(paquete, pcb_recibido);
+                pthread_mutex_lock(&MUTEX_LISTA_READY);
+                    list_add(LISTA_READY, pcb_recibido);
+                    sem_post(&CONTADOR_LISTA_READY);
+                pthread_mutex_unlock(&MUTEX_LISTA_READY);
+                break;
             default:
                 log_info(mainLog, "ERROR");
         }
@@ -90,8 +97,9 @@ void handler_check_ready_list(){
     );
 
     while(1){
-        // Escuchar si llega un pcb a la lista READY
-        // then
-        // Enviar mensaje a CPU de interrupcion y listo
+        sem_wait(&LISTA_READY_INTERRUPT);
+        t_paquete* paquete = serialize_msg_interrupt();
+        enviar_paquete(paquete, kernelInterruptFd);
+        eliminar_paquete(paquete);
     }
 }

@@ -69,11 +69,12 @@ void handler_new_to_ready(){
         pthread_mutex_unlock(&MUTEX_LISTA_NEW);
 
         uint32_t page_table_id = crear_proceso_en_memoria(pcb->pid, pcb->process_size);
-        log_info(mainLog,"ACAAA %d",page_table_id);
+        log_info(mainLog,"Page table id: %d",page_table_id);
         //Enviar y recibir valor de tabla de paginas y ponerlo en el pcb
         //TODO enviar a memoria para crear proceso y despues agregarlo a READY
         pthread_mutex_lock(&MUTEX_LISTA_READY);
             list_add(LISTA_READY, pcb);
+            sem_post(&LISTA_READY_INTERRUPT);
             sem_post(&CONTADOR_LISTA_READY);
         pthread_mutex_unlock(&MUTEX_LISTA_READY);
 
