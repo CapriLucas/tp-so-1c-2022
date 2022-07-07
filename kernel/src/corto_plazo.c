@@ -54,10 +54,12 @@ void handler_ciclo_corto_plazo(){
         uint32_t msec; 
         switch(paquete->codigo_operacion){
             case MSG_I_O:
-                //TODO cuando se haga el manejo de bloqueado, pensar como enviar el msec
                 deserialize_msg_i_o(paquete, &msec, pcb_recibido);
+                t_PCB_BLOCKED* pcb_blocked = malloc(sizeof(t_PCB_BLOCKED));
+                pcb_blocked->msec = msec;
+                pcb_blocked->pcb = pcb_recibido;
                 pthread_mutex_lock(&MUTEX_LISTA_BLOCKED);
-                    list_add(LISTA_BLOCKED, pcb_recibido);
+                    list_add(LISTA_BLOCKED, pcb_blocked);
                     sem_post(&CONTADOR_LISTA_BLOCKED);
                 pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
                 log_info(mainLog, "RECIBIDO I/O");
