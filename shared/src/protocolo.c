@@ -132,10 +132,8 @@ t_paquete* serialize_msg_i_o(uint32_t msec, t_PCB* pcb) {
    size_t size_list = list_size(pcb->instructions_list);
 
     for(int i=0; i < size_list; i++){
-		t_instruccion* aux = malloc(sizeof(t_instruccion));
-        aux = list_get(pcb->instructions_list, i);
+		t_instruccion* aux = list_get(pcb->instructions_list, i);
         agregar_a_paquete(paquete, (void*) aux, sizeof(t_instruccion));
-        free(aux);
 	}
 
     return paquete;
