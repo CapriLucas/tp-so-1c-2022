@@ -9,12 +9,18 @@
 #include <semaphore.h>
 
 #include "config.h"
+#include "protocolo.h"
 
 //TODO mover de aca
 typedef struct {
     int console_fd;
     uint32_t pid;    
 } t_socket_pid;
+
+typedef struct {
+    t_PCB* pcb;
+    uint32_t msec;    
+} t_PCB_BLOCKED;
 
 #define SERVERNAME "KERNEL_SERVER"
 
@@ -59,6 +65,16 @@ extern pthread_mutex_t MUTEX_LISTA_EXIT_PID;
 extern t_list* LISTA_BLOCKED;
 extern pthread_mutex_t MUTEX_LISTA_BLOCKED;
 extern sem_t CONTADOR_LISTA_BLOCKED;
+extern sem_t LISTA_BLOCKED_TIMER;
 
+// -- Lista SUSPENDED_BLOCKED
+extern t_list* LISTA_SUSPENDED_BLOCKED;
+extern pthread_mutex_t MUTEX_LISTA_SUSPENDED_BLOCKED;
+extern sem_t CONTADOR_LISTA_SUSPENDED_BLOCKED;
+
+// -- Lista SUSPENDED_READY
+extern t_list* LISTA_SUSPENDED_READY;
+extern pthread_mutex_t MUTEX_LISTA_SUSPENDED_READY;
+extern sem_t CONTADOR_LISTA_SUSPENDED_READY;
 
 #endif

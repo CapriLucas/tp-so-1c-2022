@@ -6,6 +6,7 @@
 #include "sockets.h"
 #include "protocolo.h"
 #include "dispatcher.h"
+#include "mediano_plazo.h"
 #include <semaphore.h>
 #include <pthread.h>
 

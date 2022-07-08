@@ -33,7 +33,7 @@ void handler_largo_plazo() {
 // Libera: 1 + en items NEW
 void handler_consola_listener(){
     log_info(mainLog, "Controlador de consola iniciado correctamente");
-    while(server_escuchar(SERVERNAME, server_fd));
+    while(server_escuchar("CONSOLA", server_fd));
 }
 
 
@@ -69,7 +69,7 @@ void handler_new_to_ready(){
         pthread_mutex_unlock(&MUTEX_LISTA_NEW);
 
         uint32_t page_table_id = crear_proceso_en_memoria(pcb->pid, pcb->process_size);
-        log_info(mainLog,"Page table id: %d",page_table_id);
+        //log_info(mainLog,"Page table id: %d",page_table_id);
         //Enviar y recibir valor de tabla de paginas y ponerlo en el pcb
         //TODO enviar a memoria para crear proceso y despues agregarlo a READY
         pthread_mutex_lock(&MUTEX_LISTA_READY);
@@ -103,7 +103,7 @@ void handler_exit(){
         pthread_mutex_lock(&MUTEX_LISTA_EXIT);
             pcb_exit = list_get(LISTA_EXIT, 0);
             list_remove(LISTA_EXIT, 0);
-            log_info(mainLog,"obtenemos de exit el proceso (%d)",pcb_exit->pid);
+            log_info(mainLog,"Exit pid: %d",pcb_exit->pid);
         pthread_mutex_unlock(&MUTEX_LISTA_EXIT);
 
         pthread_mutex_lock(&MUTEX_LISTA_EXIT_PID);

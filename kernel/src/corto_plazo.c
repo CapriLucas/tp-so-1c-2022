@@ -41,6 +41,7 @@ void handler_ciclo_corto_plazo(){
 
         t_paquete* mensaje_para_cpu = serialize_msg_exec(pcb);
         enviar_paquete(mensaje_para_cpu, kernelDispatchFd);
+        log_info(mainLog, "Ejecutamos PID: %d",pcb->pid);
         destroy_pcb(pcb);
         eliminar_paquete(mensaje_para_cpu);
         
@@ -54,13 +55,16 @@ void handler_ciclo_corto_plazo(){
         uint32_t msec; 
         switch(paquete->codigo_operacion){
             case MSG_I_O:
-                //TODO cuando se haga el manejo de bloqueado, pensar como enviar el msec
                 deserialize_msg_i_o(paquete, &msec, pcb_recibido);
+                t_PCB_BLOCKED* pcb_blocked = malloc(sizeof(t_PCB_BLOCKED));
+                pcb_blocked->msec = msec;
+                pcb_blocked->pcb = pcb_recibido;
                 pthread_mutex_lock(&MUTEX_LISTA_BLOCKED);
-                    list_add(LISTA_BLOCKED, pcb_recibido);
+                    list_add(LISTA_BLOCKED, pcb_blocked);
                     sem_post(&CONTADOR_LISTA_BLOCKED);
                 pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
-                log_info(mainLog, "RECIBIDO I/O");
+                handler_check_blocked_timer(pcb_blocked);
+                log_info(mainLog, "Se bloquea pid: %d", pcb_recibido->pid);
                 break;
             case MSG_EXIT:
                 deserialize_msg_exit(paquete, pcb_recibido);

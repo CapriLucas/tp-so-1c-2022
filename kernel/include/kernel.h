@@ -12,6 +12,8 @@
 #include "init_kernel.h"
 #include "largo_plazo.h"
 #include "corto_plazo.h"
+#include "mediano_plazo.h"
+#include "i_o.h"
 #include "shared_utils.h"
 #include "global.h"
 

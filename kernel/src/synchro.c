@@ -19,6 +19,15 @@ pthread_mutex_t MUTEX_LISTA_EXIT_PID;
 // -- BLOCKED
 pthread_mutex_t MUTEX_LISTA_BLOCKED;
 sem_t CONTADOR_LISTA_BLOCKED;
+sem_t LISTA_BLOCKED_TIMER;
+
+// -- SUSPENDED_BLOCKED
+pthread_mutex_t MUTEX_LISTA_SUSPENDED_BLOCKED;
+sem_t CONTADOR_LISTA_SUSPENDED_BLOCKED;
+
+// -- SUSPENDED_READY
+pthread_mutex_t MUTEX_LISTA_SUSPENDED_READY;
+sem_t CONTADOR_LISTA_SUSPENDED_READY;
 
 // General
 pthread_mutex_t MUTEX_NEXT_PID;
@@ -38,6 +47,13 @@ void initializeSemaphores(){
 
     pthread_mutex_init(&MUTEX_LISTA_BLOCKED, NULL);
     sem_init(&CONTADOR_LISTA_BLOCKED, 0, 0);
+    sem_init(&LISTA_BLOCKED_TIMER, 0, 0);
+
+    pthread_mutex_init(&MUTEX_LISTA_SUSPENDED_BLOCKED, NULL);
+    sem_init(&CONTADOR_LISTA_SUSPENDED_BLOCKED, 0, 0);
+
+    pthread_mutex_init(&MUTEX_LISTA_SUSPENDED_READY, NULL);
+    sem_init(&CONTADOR_LISTA_SUSPENDED_READY, 0, 0);
 
     pthread_mutex_init(&MUTEX_NEXT_PID, NULL);
     sem_init(&GRADO_MULTIPROGRAMACION, 0, mainConfig->GRADO_MULTIPROGRAMACION);

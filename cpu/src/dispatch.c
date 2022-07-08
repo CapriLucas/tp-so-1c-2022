@@ -143,7 +143,6 @@ int exec_read (t_PCB* pcb, t_instruccion* instruc) {
 
     log_info(log_CPU, "Ejecutando instrucción READ %u", instruc->param_1);
     send(memoriaFd, "READ", instruc->param_1, instruc->param_2);
-    printf("memoriaFd: %d\n", memoriaFd);
     
     return EXIT_SUCCESS;
 }
@@ -154,7 +153,6 @@ int exec_copy (t_PCB* pcb, t_instruccion* instruc) {
 
     log_info(log_CPU, "Ejecutando instrucción COPY %u %u", instruc->param_1, instruc->param_2);
     send(memoriaFd, "COPY", instruc->param_1, instruc->param_2);
-    printf("memoriaFd: %d\n", memoriaFd);
 
     return EXIT_SUCCESS;
 
@@ -166,7 +164,6 @@ int exec_write (t_PCB* pcb, t_instruccion* instruc) {
 
     log_info(log_CPU, "Ejecutando instrucción WRITE %u %u", instruc->param_1, instruc->param_2);
     send(memoriaFd, "WRITE", instruc->param_1, instruc->param_2);
-    printf("memoriaFd: %d\n", memoriaFd);
     
     return EXIT_SUCCESS;
 
