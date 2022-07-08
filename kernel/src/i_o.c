@@ -15,11 +15,11 @@ void handler_i_o() {
 
             usleep(pcb_blocked->msec);
             
+            log_info(mainLog, "DESBLOQUEO PID %d (suspended)", pcb_blocked->pcb->pid);
             pthread_mutex_lock(&MUTEX_LISTA_SUSPENDED_READY);
                 list_add(LISTA_SUSPENDED_READY, pcb_blocked->pcb);
             pthread_mutex_unlock(&MUTEX_LISTA_SUSPENDED_READY);
             sem_post(&CONTADOR_LISTA_SUSPENDED_READY);
-            log_info(mainLog, "DESBLOQUEO PID %d (suspended)", pcb_blocked->pcb->pid);
             free(pcb_blocked);
         } else {
             sem_wait(&CONTADOR_LISTA_BLOCKED);
@@ -31,12 +31,12 @@ void handler_i_o() {
             
             usleep(pcb_blocked->msec);
 
+            log_info(mainLog, "DESBLOQUEO PID %d", pcb_blocked->pcb->pid);
             pthread_mutex_lock(&MUTEX_LISTA_READY);
                 list_add(LISTA_READY, pcb_blocked->pcb);
             pthread_mutex_unlock(&MUTEX_LISTA_READY);
             sem_post(&CONTADOR_LISTA_READY);
             sem_post(&LISTA_READY_INTERRUPT);
-            log_info(mainLog, "DESBLOQUEO PID %d", pcb_blocked->pcb->pid);
             free(pcb_blocked);
         }
     }
