@@ -47,6 +47,9 @@ uint32_t crear_proceso_en_memoria(uint32_t pid,uint32_t process_size){
     enviar_paquete(paquete, memoriaFd);
     uint32_t page_table_id;
     recv(memoriaFd, &page_table_id, sizeof(uint32_t), MSG_WAITALL);
+
+    free(mensaje);
+    eliminar_paquete(paquete);
     return page_table_id;
 }
 
@@ -66,11 +69,12 @@ void handler_new_to_ready(){
         pthread_mutex_unlock(&MUTEX_LISTA_NEW);
 
         uint32_t page_table_id = crear_proceso_en_memoria(pcb->pid, pcb->process_size);
-        log_info(mainLog,"ACAAA %d",page_table_id);
+        log_info(mainLog,"Page table id: %d",page_table_id);
         //Enviar y recibir valor de tabla de paginas y ponerlo en el pcb
         //TODO enviar a memoria para crear proceso y despues agregarlo a READY
         pthread_mutex_lock(&MUTEX_LISTA_READY);
             list_add(LISTA_READY, pcb);
+            sem_post(&LISTA_READY_INTERRUPT);
             sem_post(&CONTADOR_LISTA_READY);
         pthread_mutex_unlock(&MUTEX_LISTA_READY);
 
@@ -87,24 +91,13 @@ bool _is_the_pcb_to_delete(t_socket_pid *p) {
     return res;
 }
 
+static void instructions_destroy(t_instruccion *self) {
+    free(self);
+} //TODO refactor esto a shared
+
 void handler_exit(){
     log_info(mainLog, "Controlador de exit done");
      while(1){
-
-//TODO EN CUANTO ESTE EL PLANIFICADOR CORTO PLAZO SACAR ESTO PORFAVOR
-// //EMULADOR PARA PROBAR pasar de ready a exit apenas vayan llegando
-// t_PCB* pcb;
-// sem_wait(&CONTADOR_LISTA_READY);
-// pthread_mutex_lock(&MUTEX_LISTA_READY);
-//     pcb = list_get(LISTA_READY, 0);
-//     list_remove(LISTA_READY, 0);
-// pthread_mutex_unlock(&MUTEX_LISTA_READY);
-// pthread_mutex_lock(&MUTEX_LISTA_EXIT);
-//     list_add(LISTA_EXIT, pcb);
-//     log_info(mainLog,"Agregamos a exit el proceso (%d)",pcb->pid);
-//     sem_post(&CONTADOR_LISTA_EXIT);
-// pthread_mutex_unlock(&MUTEX_LISTA_EXIT);  
-// // ACA EMPIEZA
 
         sem_wait(&CONTADOR_LISTA_EXIT);
         pthread_mutex_lock(&MUTEX_LISTA_EXIT);
@@ -123,6 +116,7 @@ void handler_exit(){
         send(socket_consola, "EXIT", 4, 0);
         //TODO Mandar senal para matar proceso en memoria;
         free(socket_pid);
+        list_destroy_and_destroy_elements(pcb_exit->instructions_list, (void*) instructions_destroy);
         free(pcb_exit);
         liberar_conexion(&socket_consola);
 

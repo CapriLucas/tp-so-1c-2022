@@ -91,5 +91,11 @@ t_paquete* serialize_msg_exit(t_PCB* pcb);
 // Deserializa mensaje EXIT (CPU -> Kernel)
 void deserialize_msg_exit(t_paquete* paquete, t_PCB* pcb);
 
+t_paquete* serialize_msg_interrupt();
+t_paquete* serialize_msg_interrupt_ack(t_PCB* pcb);
+void deserialize_msg_interrupt_ack(t_paquete* paquete, t_PCB* pcb);
+
+
+void destroy_pcb(t_PCB* pcb);
 
 #endif
