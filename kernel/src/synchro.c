@@ -19,6 +19,7 @@ pthread_mutex_t MUTEX_LISTA_EXIT_PID;
 // -- BLOCKED
 pthread_mutex_t MUTEX_LISTA_BLOCKED;
 sem_t CONTADOR_LISTA_BLOCKED;
+sem_t LISTA_BLOCKED_TIMER;
 
 // -- SUSPENDED_BLOCKED
 pthread_mutex_t MUTEX_LISTA_SUSPENDED_BLOCKED;
@@ -46,6 +47,7 @@ void initializeSemaphores(){
 
     pthread_mutex_init(&MUTEX_LISTA_BLOCKED, NULL);
     sem_init(&CONTADOR_LISTA_BLOCKED, 0, 0);
+    sem_init(&LISTA_BLOCKED_TIMER, 0, 0);
 
     pthread_mutex_init(&MUTEX_LISTA_SUSPENDED_BLOCKED, NULL);
     sem_init(&CONTADOR_LISTA_SUSPENDED_BLOCKED, 0, 0);

@@ -51,6 +51,15 @@ int main(){
         return EXIT_FAILURE;
     }
 
+    // Comienza hilo mediano plazo
+    pthread_t THREAD_MEDIANO_PLAZO;
+    if(!pthread_create(&THREAD_MEDIANO_PLAZO, NULL, (void*) handler_mediano_plazo , NULL))
+        pthread_detach(THREAD_MEDIANO_PLAZO);
+    else {
+        log_error(mainLog, "ERROR CRITICO INICIANDO EL planif mediano plazo. ABORTANDO.");
+        return EXIT_FAILURE;
+    }
+
 
 
     //TODO ver como sacar esta espera activa del main thread

@@ -17,7 +17,7 @@ typedef struct {
     uint16_t ESTIMACION_INICIAL;    
     double ALFA;
     uint16_t GRADO_MULTIPROGRAMACION;    
-    uint16_t TIEMPO_MAXIMO_BLOQUEADO;    
+    uint32_t TIEMPO_MAXIMO_BLOQUEADO;    
     
 } t_config_kernel;
 

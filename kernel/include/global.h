@@ -65,6 +65,7 @@ extern pthread_mutex_t MUTEX_LISTA_EXIT_PID;
 extern t_list* LISTA_BLOCKED;
 extern pthread_mutex_t MUTEX_LISTA_BLOCKED;
 extern sem_t CONTADOR_LISTA_BLOCKED;
+extern sem_t LISTA_BLOCKED_TIMER;
 
 // -- Lista SUSPENDED_BLOCKED
 extern t_list* LISTA_SUSPENDED_BLOCKED;
