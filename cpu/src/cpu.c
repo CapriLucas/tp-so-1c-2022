@@ -20,12 +20,13 @@ int main(){
 
     inicializar_proceso();
     
+    char* puerto_memoria = string_itoa(config_CPU->PUERTO_MEMORIA);
     // Crear conexión con MEMORIA 
     memoriaFd = crear_conexion (
         log_CPU, 
         "CPU", 
         config_CPU->IP_MEMORIA, 
-        "8002" // config_CPU->PUERTO_MEMORIA
+        puerto_memoria
     );
 
     if (!memoriaFd) {        

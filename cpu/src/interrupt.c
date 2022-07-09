@@ -4,11 +4,12 @@
 void interrupt_server() {
 
     // Puerto en el cual se escuchará la conexión del Kernel para mensajes de interrupciones
+    char* puerto_interrupt = string_itoa(config_CPU->PUERTO_ESCUCHA_INTERRUPT);
     cpuInterruptFd = iniciar_servidor (
         log_CPU,
         "CPU",
         "127.0.0.1", 
-        "8005"  // config_CPU->PUERTO_ESCUCHA_INTERRUPT
+        puerto_interrupt
     );
 
     if (!cpuInterruptFd) {    

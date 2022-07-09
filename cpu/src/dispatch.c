@@ -49,11 +49,12 @@ bool exec_instruction (t_PCB* pcb, t_instruccion* instruc) {
 void dispatch_server() {
 
     // Inicia server en puerto en el cual se escuchará la conexión del Kernel para mensajes de dispatch
+    char* puerto_dispatch = string_itoa(config_CPU->PUERTO_ESCUCHA_DISPATCH);
     cpuDispatchFd = iniciar_servidor (
         log_CPU,
         "CPU",
         "127.0.0.1", 
-        "8001"  // config_CPU->PUERTO_ESCUCHA_DISPATCH
+        puerto_dispatch
     );
 
     if (!cpuDispatchFd) {

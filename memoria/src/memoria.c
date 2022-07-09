@@ -23,11 +23,12 @@ int main(){
     printf("PATH_SWAP: %s\n", config_Memoria->PATH_SWAP);
 
     // Iniciar server
+    char* puerto_memoria = string_itoa(config_Memoria->PUERTO_ESCUCHA);
     memoriaFd = iniciar_servidor (
         log_Memoria,
         "MEMORIA",
         "127.0.0.1",
-        "8002"      // config_Memoria->PUERTO_ESCUCHA
+        puerto_memoria
     );
 
     if (!memoriaFd) {

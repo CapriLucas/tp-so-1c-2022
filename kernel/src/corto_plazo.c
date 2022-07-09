@@ -25,12 +25,13 @@ void handler_corto_plazo() {
 void handler_ciclo_corto_plazo(){
     log_info(mainLog, "Controlador de ciclo de corto plazo iniciado correctamente");
 
-    // Crear conexión con CPU (dispatch)  
+    // Crear conexión con CPU (dispatch)
+    char* puerto_dispatch = string_itoa(mainConfig->PUERTO_CPU_DISPATCH);
     kernelDispatchFd = crear_conexion (
         mainLog, 
         "CPU", 
         mainConfig->IP_CPU, 
-        "8001"  // mainConfig->PUERTO_CPU_DISPATCH 
+        puerto_dispatch
     );
 
     while(1){
@@ -93,11 +94,12 @@ void handler_check_ready_list(){
     log_info(mainLog, "Controlador de check ready list iniciado correctamente");
     
     // Crear conexión con CPU (interrupciones)
+    char* puerto_interrupt = string_itoa(mainConfig->PUERTO_CPU_INTERRUPT);
     kernelInterruptFd = crear_conexion (
         mainLog, 
         "CPU", 
         mainConfig->IP_CPU, 
-        "8005"  // mainConfig->PUERTO_CPU_INTERRUPT
+        puerto_interrupt
     );
 
     while(1){
