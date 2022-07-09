@@ -28,4 +28,22 @@ void interrupt_server() {
         exit(EXIT_FAILURE);
     }
 
+    while (1) {
+        t_paquete* paquete = malloc(sizeof(t_paquete));
+
+        if(recibir_header(paquete, kernelInterruptFd) == 0){
+            return;
+        }
+        if(paquete->codigo_operacion != MSG_INTERRUPT){
+            log_info(log_CPU, "Se espera recibir MSG_INTERRUPT codigo de operacion");
+            return;
+        }
+
+        pthread_mutex_lock(&MUTEX_INTERRUPT);
+        interrupt = true;
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
+
+        eliminar_paquete(paquete);
+    }
+
 }

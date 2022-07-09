@@ -96,12 +96,15 @@ void dispatch_server() {
             if(desalojar) {
                 break;
             }
-            /*
+            
+            pthread_mutex_lock(&MUTEX_INTERRUPT);            
             if(interrupt) {
-                return_pcb(pcb); // o return_interrupt(pcb) ...
-                break;
-            } */
+                interrupt = false;
+                return_pcb_interrupt(pcb);
+            }
+            pthread_mutex_unlock(&MUTEX_INTERRUPT);
         }
+
         destroy_pcb(pcb);
         eliminar_paquete(paquete);
     }
@@ -176,6 +179,22 @@ int exec_exit (t_PCB* pcb) {
     log_info(log_CPU, "Ejecutando instrucción EXIT");  
 
     t_paquete* paquete = serialize_msg_exit(pcb);
+    
+    enviar_paquete(paquete, kernelDispatchFd);
+
+    eliminar_paquete(paquete);
+
+    return EXIT_SUCCESS;
+
+}
+
+
+// Execute INTERRUPT
+int return_pcb_interrupt (t_PCB* pcb) {
+
+    log_info(log_CPU, "Ejecutando INTERRUPT");  
+
+    t_paquete* paquete = serialize_msg_interrupt_ack(pcb);
     
     enviar_paquete(paquete, kernelDispatchFd);
 

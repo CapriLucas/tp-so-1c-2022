@@ -32,7 +32,8 @@ int exec_write (t_PCB*, t_instruccion*);
 int exec_copy (t_PCB*, t_instruccion*);
 // Execute instruction EXIT
 int exec_exit (t_PCB*);
-
+// Execute INTERRUPT
+int return_pcb_interrupt (t_PCB* pcb);
 
 // Fetch instruction
 t_instruccion* fetch_instruction (t_PCB* pcb);

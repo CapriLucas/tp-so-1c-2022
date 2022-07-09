@@ -1,13 +1,20 @@
 #include "cpu.h"
 
+// Config & Log
 t_config_CPU* config_CPU;
 t_log* log_CPU;
 
+// Sockets
 int memoriaFd;
 int cpuDispatchFd;
 int kernelDispatchFd;
 int cpuInterruptFd;
 int kernelInterruptFd;
+
+// Threads & Mutex
+bool interrupt = false;
+pthread_mutex_t MUTEX_INTERRUPT;
+
 
 int main(){
 
