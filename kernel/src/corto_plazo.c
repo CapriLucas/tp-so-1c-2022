@@ -61,8 +61,8 @@ void handler_ciclo_corto_plazo(){
                 pcb_blocked->pcb = pcb_recibido;
                 pthread_mutex_lock(&MUTEX_LISTA_BLOCKED);
                     list_add(LISTA_BLOCKED, pcb_blocked);
-                    sem_post(&CONTADOR_LISTA_BLOCKED);
                 pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
+                //Hacemos el post de contador_lista_blocked una vez que ya leimos el contenido en el timer
                 handler_check_blocked_timer(pcb_blocked);
                 log_info(mainLog, "Se bloquea pid: %d", pcb_recibido->pid);
                 break;

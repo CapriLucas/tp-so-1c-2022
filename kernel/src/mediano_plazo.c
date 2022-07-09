@@ -51,6 +51,9 @@ void handler_check_blocked_timer(t_PCB_BLOCKED* pcb_to_suspend){
 
 void process_timer(t_PCB_BLOCKED* pcb_to_suspend){
     uint32_t pid_to_suspend = pcb_to_suspend->pcb->pid;
+    // Una vez que liberamos el puntero marcamos como que ya lo cargamos en blocked
+    sem_post(&CONTADOR_LISTA_BLOCKED);
+    
     bool _is_the_pcb_to_suspend(t_PCB_BLOCKED* pcb_blocked) {
         bool res = pcb_blocked->pcb->pid == pid_to_suspend;
         return res;
