@@ -11,7 +11,7 @@ void handler_corto_plazo() {
         exit(EXIT_FAILURE);
     }
 
-    if(false){//TODO poner: si no es SRT. O si es fifo
+    if(strcasecmp(mainConfig->ALGORITMO_PLANIFICACION, "SRT") == 0) {
         pthread_t THREAD_CHECK_READY_LIST;
         if(!pthread_create(&THREAD_CHECK_READY_LIST, NULL, (void*) handler_check_ready_list, NULL))
             pthread_detach(THREAD_CHECK_READY_LIST);
@@ -62,9 +62,9 @@ void handler_ciclo_corto_plazo(){
                 pcb_blocked->pcb = pcb_recibido;
                 pthread_mutex_lock(&MUTEX_LISTA_BLOCKED);
                     list_add(LISTA_BLOCKED, pcb_blocked);
-                    sem_post(&CONTADOR_LISTA_BLOCKED);
+                    handler_check_blocked_timer(pcb_blocked);
                 pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
-                handler_check_blocked_timer(pcb_blocked);
+                sem_post(&CONTADOR_LISTA_BLOCKED);
                 log_info(mainLog, "Se bloquea pid: %d", pcb_recibido->pid);
                 break;
             case MSG_EXIT:

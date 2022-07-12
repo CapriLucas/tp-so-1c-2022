@@ -101,9 +101,12 @@ void dispatch_server() {
             pthread_mutex_lock(&MUTEX_INTERRUPT);            
             if(interrupt) {
                 interrupt = false;
+                pthread_mutex_unlock(&MUTEX_INTERRUPT);
                 return_pcb_interrupt(pcb);
+                break;
+            } else {
+                pthread_mutex_unlock(&MUTEX_INTERRUPT);                
             }
-            pthread_mutex_unlock(&MUTEX_INTERRUPT);
         }
 
         destroy_pcb(pcb);
@@ -118,7 +121,7 @@ int exec_no_op () {
     log_info(log_CPU, "Ejecutando instrución NO_OP");
     
     log_info(log_CPU, "Iniciando usleep(%u)...", config_CPU->RETARDO_NOOP);
-    usleep(config_CPU->RETARDO_NOOP);
+    usleep(config_CPU->RETARDO_NOOP * 1000);
     log_info(log_CPU, "Finalizando usleep(%u)...", config_CPU->RETARDO_NOOP);
 
     return EXIT_SUCCESS;

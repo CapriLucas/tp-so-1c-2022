@@ -13,7 +13,7 @@ void handler_i_o() {
                 list_remove(LISTA_SUSPENDED_BLOCKED, 0);
             pthread_mutex_unlock(&MUTEX_LISTA_SUSPENDED_BLOCKED);
 
-            usleep(pcb_blocked->msec);
+            usleep(pcb_blocked->msec * 1000);
             
             log_info(mainLog, "DESBLOQUEO PID %d (suspended)", pcb_blocked->pcb->pid);
             pthread_mutex_lock(&MUTEX_LISTA_SUSPENDED_READY);
@@ -29,7 +29,7 @@ void handler_i_o() {
                 list_remove(LISTA_BLOCKED, 0);
             pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
             
-            usleep(pcb_blocked->msec);
+            usleep(pcb_blocked->msec * 1000);
 
             log_info(mainLog, "DESBLOQUEO PID %d", pcb_blocked->pcb->pid);
             pthread_mutex_lock(&MUTEX_LISTA_READY);
