@@ -65,6 +65,7 @@ void handler_ciclo_corto_plazo(){
                     handler_check_blocked_timer(pcb_blocked);
                 pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
                 sem_post(&CONTADOR_LISTA_BLOCKED);
+
                 log_info(mainLog, "Se bloquea pid: %d", pcb_recibido->pid);
                 break;
             case MSG_EXIT:
