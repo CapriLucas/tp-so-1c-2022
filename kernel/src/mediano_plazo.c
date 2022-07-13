@@ -1,7 +1,7 @@
 #include "mediano_plazo.h"
 
 void handler_check_blocked_timer(t_PCB_BLOCKED* pcb_to_suspend);
-void process_timer(t_PCB_BLOCKED* pcb_to_suspend);
+void process_timer(uint32_t* pid_to_suspend);
 void handler_susp_ready_to_ready();
 
 void handler_mediano_plazo(){
@@ -39,8 +39,12 @@ void handler_susp_ready_to_ready(){
 }
 
 void handler_check_blocked_timer(t_PCB_BLOCKED* pcb_to_suspend){
+    uint32_t* pid_to_suspend = malloc(sizeof(uint32_t));
+    uint32_t aux = pcb_to_suspend->pcb->pid;
+    memcpy(pid_to_suspend, &(aux), sizeof(uint32_t));
+
     pthread_t THREAD_PROCESS_TIMER;
-    if(!pthread_create(&THREAD_PROCESS_TIMER, NULL, (void*) process_timer, pcb_to_suspend))
+    if(!pthread_create(&THREAD_PROCESS_TIMER, NULL, (void*) process_timer, pid_to_suspend))
         pthread_detach(THREAD_PROCESS_TIMER);
     else {
         log_error(mainLog, "ERROR CRITICO INICIANDO EL CONTROLADOR DE THREAD_PROCESS_TIMER. ABORTANDO.");
@@ -49,16 +53,12 @@ void handler_check_blocked_timer(t_PCB_BLOCKED* pcb_to_suspend){
 }
 
 
-void process_timer(t_PCB_BLOCKED* pcb_to_suspend){
-    uint32_t pid_to_suspend = pcb_to_suspend->pcb->pid;
-    // Una vez que liberamos el puntero marcamos como que ya lo cargamos en blocked
-    sem_post(&CONTADOR_LISTA_BLOCKED);
-    
+void process_timer(uint32_t* pid_to_suspend){
     bool _is_the_pcb_to_suspend(t_PCB_BLOCKED* pcb_blocked) {
-        bool res = pcb_blocked->pcb->pid == pid_to_suspend;
+        bool res = pcb_blocked->pcb->pid == *pid_to_suspend;
         return res;
     }
-    usleep(mainConfig->TIEMPO_MAXIMO_BLOQUEADO);
+    usleep(mainConfig->TIEMPO_MAXIMO_BLOQUEADO * 1000);
     pthread_mutex_lock(&MUTEX_LISTA_BLOCKED);
         t_PCB_BLOCKED* pcb_blocked = list_find(LISTA_BLOCKED, (void*) _is_the_pcb_to_suspend);
     pthread_mutex_unlock(&MUTEX_LISTA_BLOCKED);
@@ -72,6 +72,7 @@ void process_timer(t_PCB_BLOCKED* pcb_to_suspend){
         pthread_mutex_unlock(&MUTEX_LISTA_SUSPENDED_BLOCKED);
         sem_post(&CONTADOR_LISTA_SUSPENDED_BLOCKED);
         sem_post(&GRADO_MULTIPROGRAMACION);
-        log_info(mainLog, "Suspendemos al proceso PID:%d", pid_to_suspend);
+        log_info(mainLog, "Suspendemos al proceso PID:%d", *pid_to_suspend);
     }
+    free(pid_to_suspend);
 }

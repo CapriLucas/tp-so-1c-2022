@@ -72,12 +72,6 @@ static void procesar_conexion(void* void_args) {
 
     //TODO ver campos hardcodeados al crear pcb de instruccion
     t_PCB* pcb = crear_pcb(process_memory_size, lista_instrucciones, 0, 0, 0);
-    
-    pthread_mutex_lock(&MUTEX_LISTA_NEW);
-    list_add(LISTA_NEW, (void*) pcb);
-    pthread_mutex_unlock(&MUTEX_LISTA_NEW);
-    sem_post(&CONTADOR_LISTA_NEW);
-    
     t_socket_pid* socket_pid = malloc(sizeof(t_socket_pid));
     
     socket_pid->pid = pcb->pid;
@@ -85,6 +79,13 @@ static void procesar_conexion(void* void_args) {
     pthread_mutex_lock(&MUTEX_LISTA_EXIT_PID);
     list_add(LISTA_EXIT_PID, (void*) socket_pid);
     pthread_mutex_unlock(&MUTEX_LISTA_EXIT_PID);
+    
+    pthread_mutex_lock(&MUTEX_LISTA_NEW);
+    list_add(LISTA_NEW, (void*) pcb);
+    pthread_mutex_unlock(&MUTEX_LISTA_NEW);
+    sem_post(&CONTADOR_LISTA_NEW);
+    
+    
 
     eliminar_paquete(paquete);
     return;

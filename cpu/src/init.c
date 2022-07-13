@@ -11,6 +11,9 @@ void inicializar_proceso() {
     if (!cargar_configuracion(config_CPU, log_CPU)) {
         exit(EXIT_FAILURE);
     }
+
+    // Mutex Interrupt
+    pthread_mutex_init(&MUTEX_INTERRUPT, NULL);
 }
 
 
@@ -27,6 +30,9 @@ void cerrar_programa() {
     free(config_CPU->REEMPLAZO_TLB);
     free(config_CPU->IP_MEMORIA);
     free(config_CPU);
+
+    // Mutex Interrupt
+    pthread_mutex_destroy(&MUTEX_INTERRUPT);
 
     // CPU log
     log_destroy(log_CPU);

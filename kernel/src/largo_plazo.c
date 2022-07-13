@@ -82,7 +82,6 @@ void handler_new_to_ready(){
     }
 }
 
-
 // Si hay un proceso en la cola de exit. Se encarga de sacarlo y notificarle a memoria y a la consola
  t_PCB* pcb_exit;
 

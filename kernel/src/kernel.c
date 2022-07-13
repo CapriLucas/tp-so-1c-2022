@@ -12,11 +12,12 @@ int main(){
     initializeKernel();
 
     // Crear conexión con MEMORIA
+    char* puerto_memoria = string_itoa(mainConfig->PUERTO_MEMORIA);
     memoriaFd = crear_conexion (
         mainLog, 
         "MEMORIA", 
         mainConfig->IP_MEMORIA, 
-        "8002" // mainConfig->PUERTO_MEMORIA
+        puerto_memoria
     );
 
     if (!memoriaFd) {    

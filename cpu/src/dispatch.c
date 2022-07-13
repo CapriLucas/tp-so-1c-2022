@@ -49,11 +49,12 @@ bool exec_instruction (t_PCB* pcb, t_instruccion* instruc) {
 void dispatch_server() {
 
     // Inicia server en puerto en el cual se escuchará la conexión del Kernel para mensajes de dispatch
+    char* puerto_dispatch = string_itoa(config_CPU->PUERTO_ESCUCHA_DISPATCH);
     cpuDispatchFd = iniciar_servidor (
         log_CPU,
         "CPU",
         "127.0.0.1", 
-        "8001"  // config_CPU->PUERTO_ESCUCHA_DISPATCH
+        puerto_dispatch
     );
 
     if (!cpuDispatchFd) {
@@ -96,12 +97,18 @@ void dispatch_server() {
             if(desalojar) {
                 break;
             }
-            /*
+            
+            pthread_mutex_lock(&MUTEX_INTERRUPT);            
             if(interrupt) {
-                return_pcb(pcb); // o return_interrupt(pcb) ...
+                interrupt = false;
+                pthread_mutex_unlock(&MUTEX_INTERRUPT);
+                return_pcb_interrupt(pcb);
                 break;
-            } */
+            } else {
+                pthread_mutex_unlock(&MUTEX_INTERRUPT);                
+            }
         }
+
         destroy_pcb(pcb);
         eliminar_paquete(paquete);
     }
@@ -114,7 +121,7 @@ int exec_no_op () {
     log_info(log_CPU, "Ejecutando instrución NO_OP");
     
     log_info(log_CPU, "Iniciando usleep(%u)...", config_CPU->RETARDO_NOOP);
-    usleep(config_CPU->RETARDO_NOOP);
+    usleep(config_CPU->RETARDO_NOOP * 1000);
     log_info(log_CPU, "Finalizando usleep(%u)...", config_CPU->RETARDO_NOOP);
 
     return EXIT_SUCCESS;
@@ -176,6 +183,22 @@ int exec_exit (t_PCB* pcb) {
     log_info(log_CPU, "Ejecutando instrucción EXIT");  
 
     t_paquete* paquete = serialize_msg_exit(pcb);
+    
+    enviar_paquete(paquete, kernelDispatchFd);
+
+    eliminar_paquete(paquete);
+
+    return EXIT_SUCCESS;
+
+}
+
+
+// Execute INTERRUPT
+int return_pcb_interrupt (t_PCB* pcb) {
+
+    log_info(log_CPU, "Ejecutando INTERRUPT");  
+
+    t_paquete* paquete = serialize_msg_interrupt_ack(pcb);
     
     enviar_paquete(paquete, kernelDispatchFd);
 
