@@ -19,13 +19,42 @@ void handler_memory() {
         exit(EXIT_FAILURE);
     }
 
-    // TEST :: HANDSHAKE message: CPU -> MEMORY
-    send_msg_cpu_handshake();
-    
-    // TEST :: HANDSHAKE response: MEMORY -> CPU 
+    // TEST :: HANDSHAKE 
+    // Message: CPU -> MEMORY
+    send_msg_cpu_handshake();    
+    // Response: MEMORY -> CPU 
     uint32_t page_size;
     uint32_t input_table_qty;
     recv_msg_cpu_handshake(&page_size, &input_table_qty);
+
+    // TEST :: READ 
+    // Message: CPU -> MEMORY
+    uint32_t physical_address = 64;
+    send_msg_cpu_read(&physical_address);
+    // Response: MEMORY -> CPU
+    uint32_t value;
+    recv_msg_cpu_read(&value);
+
+    // TEST :: WRITE 
+    // Message: CPU -> MEMORY
+    physical_address = 128;
+    value = 54321;
+    send_msg_cpu_write(&physical_address, &value);
+    // Response: MEMORY -> CPU
+    recv_msg_cpu_write();
+
+    // TEST :: ACCESS MEMORY
+    // 1st message: CPU -> MEMORY
+    uint32_t page_number_1st = 16;
+    send_msg_cpu_access_memory_1st(&page_number_1st);
+    // 1st response: MEMORY -> CPU
+    uint32_t page_number_2nd;
+    recv_msg_cpu_access_memory_1st(&page_number_2nd);
+    // 2dn message: CPU -> MEMORY
+    send_msg_cpu_access_memory_2nd(&page_number_2nd);
+    // 2nd response: MEMORY -> CPU
+    uint32_t frame_number;
+    recv_msg_cpu_access_memory_2nd(&frame_number);
 
 }
 
@@ -82,7 +111,7 @@ int send_msg_cpu_read(uint32_t* physical_address) {
 // READ response: MEMORY -> CPU
 int recv_msg_cpu_read(uint32_t* value) {
 
-    log_info(log_CPU, "Recibiendo mensaje de MEMORIA: READ");
+    log_info(log_CPU, "Recibiendo respuesta de MEMORIA: READ");
 
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -118,7 +147,7 @@ int send_msg_cpu_write(uint32_t* physical_address, uint32_t* value) {
 // WRITE response: MEMORY -> CPU
 int recv_msg_cpu_write() {
 
-    log_info(log_CPU, "Recibiendo mensaje de MEMORIA: WRITE");
+    log_info(log_CPU, "Recibiendo respuesta de MEMORIA: WRITE");
 
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -152,7 +181,7 @@ int send_msg_cpu_access_memory_1st(uint32_t* page_number) {
 // ACCESS MEMORY response: MEMORY -> CPU
 int recv_msg_cpu_access_memory_1st(uint32_t* page_number) {
 
-    log_info(log_CPU, "Recibiendo mensaje de MEMORIA: PAGE_ACCESS_1ST");
+    log_info(log_CPU, "Recibiendo respuesta de MEMORIA: PAGE_ACCESS_1ST");
 
     t_paquete* paquete = malloc(sizeof(t_paquete));
 
@@ -189,7 +218,7 @@ int send_msg_cpu_access_memory_2nd(uint32_t* page_number) {
 // ACCESS MEMORY response: MEMORY -> CPU
 int recv_msg_cpu_access_memory_2nd(uint32_t* frame_number) {
 
-    log_info(log_CPU, "Recibiendo mensaje de MEMORIA: PAGE_ACCESS_2ND");
+    log_info(log_CPU, "Recibiendo respuesta de MEMORIA: PAGE_ACCESS_2ND");
 
     t_paquete* paquete = malloc(sizeof(t_paquete));
 

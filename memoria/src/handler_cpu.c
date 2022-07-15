@@ -16,12 +16,38 @@ void handler_cpu() {
         exit(EXIT_FAILURE);
     }
 
-    // TEST :: HANDSHAKE message: CPU -> MEMORY
+    // TEST :: HANDSHAKE 
+    // Message: CPU -> MEMORY
     recv_msg_cpu_handshake();
+    // Response: MEMORY -> CPU
+    send_msg_cpu_handshake(&(config_Memoria->TAM_PAGINA), &(config_Memoria->ENTRADAS_POR_TABLA));
 
-    // TEST :: HANDSHAKE response: MEMORY -> CPU
-    send_msg_cpu_handshake(config_Memoria->TAM_PAGINA, config_Memoria->ENTRADAS_POR_TABLA);
+    // TEST :: READ 
+    // Message: CPU -> MEMORY
+    uint32_t physical_address;  
+    recv_msg_cpu_read(&physical_address);
+    // Response: MEMORY -> CPU
+    uint32_t value = 12345;
+    send_msg_cpu_read(&value);
 
+    // TEST :: WRITE 
+    // Message: CPU -> MEMORY
+    recv_msg_cpu_write(&physical_address, &value);
+    // Response: MEMORY -> CPU
+    send_msg_cpu_write();
+
+    // TEST :: ACCESS MEMORY 
+    // Message: CPU -> MEMORY
+    uint32_t page_number_1st;
+    recv_msg_cpu_access_memory_1st(&page_number_1st);
+    // Respose: MEMORY -> CPU
+    uint32_t page_number_2nd = 256;
+    send_msg_cpu_access_memory_1st(&page_number_2nd);
+    // Message: CPU -> MEMORY
+    recv_msg_cpu_access_memory_2nd(&page_number_2nd);
+    // Response: MEMORY -> CPU
+    uint32_t frame_number;
+    send_msg_cpu_access_memory_2nd(&frame_number);
 
 }
 

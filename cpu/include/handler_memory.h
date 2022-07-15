@@ -24,8 +24,8 @@ int recv_msg_cpu_write();
 // ACCESS MEMORY messages CPU <-> MEMORY
 int send_msg_cpu_access_memory_1st(uint32_t* page_number);
 int recv_msg_cpu_access_memory_1st(uint32_t* page_number);
-int send_msg_cpu_access_memory_1st(uint32_t* page_number);
-int recv_msg_cpu_access_memory_1st(uint32_t* frame_number);
+int send_msg_cpu_access_memory_2nd(uint32_t* page_number);
+int recv_msg_cpu_access_memory_2nd(uint32_t* frame_number);
 
 
 #endif
