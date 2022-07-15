@@ -19,21 +19,16 @@ pthread_mutex_t MUTEX_INTERRUPT;
 int main(){
 
     inicializar_proceso();
-    
-    char* puerto_memoria = string_itoa(config_CPU->PUERTO_MEMORIA);
-    // Crear conexión con MEMORIA 
-    memoriaFd = crear_conexion (
-        log_CPU, 
-        "CPU", 
-        config_CPU->IP_MEMORIA, 
-        puerto_memoria
-    );
 
-    if (!memoriaFd) {        
+    // Thread handler MEMORIA
+    pthread_t THREAD_MEMORY;
+    if (!pthread_create(&THREAD_MEMORY, NULL, (void*) handler_memory, NULL))
+        pthread_detach(THREAD_MEMORY);
+    else {
         cerrar_programa();
         return EXIT_FAILURE;
-    }
-
+    }  
+        
     // Thread en que escuchará los mensajes de INTERRUPT enviados por KERNEL
     pthread_t THREAD_INTERRUPT;
     if (!pthread_create(&THREAD_INTERRUPT, NULL, (void*) interrupt_server, NULL))
@@ -54,6 +49,7 @@ int main(){
 
     for(;;);
 
+    pthread_join(THREAD_MEMORY, NULL);
     pthread_join(THREAD_DISPATCH, NULL);
     pthread_join(THREAD_INTERRUPT, NULL);
 

@@ -13,6 +13,7 @@
 #include "init.h"
 #include "dispatch.h"
 #include "interrupt.h"
+#include "handler_memory.h"
 
 // Shared
 #include "protocolo.h"
