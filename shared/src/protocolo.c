@@ -258,6 +258,209 @@ void deserialize_msg_interrupt_ack(t_paquete* paquete, t_PCB* pcb) {
     }
 }
 
+
+/*
+ *		CPU <-> MEMORY
+ */
+
+
+// HANDSHAKE MSG (CPU -> Memory)
+// Serializa mensaje HANDSHAKE
+t_paquete* serialize_msg_cpu_mem_handshake() {
+
+    t_paquete* paquete = crear_paquete(MSG_CPU_MEM__HANDSHAKE);
+
+    return paquete;
+}
+
+
+// HANDSHAKE ACKNOWLEDGMENT MSG (Memory -> CPU)
+// Serializa mensaje HANDSHAKE ACK
+t_paquete* serialize_msg_mem_cpu_handshake(uint32_t* page_size, uint32_t* input_table_qty) {
+
+    t_paquete* paquete = crear_paquete(MSG_MEM_CPU__HANDSHAKE);
+    agregar_a_paquete(paquete, &page_size, sizeof(uint32_t));
+    agregar_a_paquete(paquete, &input_table_qty, sizeof(uint32_t));
+    
+    return paquete;
+}
+
+// Deserializa mensaje HANDSHAKE ACK
+void deserialize_msg_mem_cpu_handshake(t_paquete* paquete, uint32_t* page_size, uint32_t* input_table_qty) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(page_size, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(input_table_qty, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// READ MSG (CPU -> Memory)
+// Serializa mensaje READ
+t_paquete* serialize_msg_cpu_mem_read(uint32_t* physical_address) {
+
+    t_paquete* paquete = crear_paquete(MSG_CPU_MEM__READ);
+    agregar_a_paquete(paquete, &physical_address, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje READ
+void deserialize_msg_cpu_mem_read(t_paquete* paquete, uint32_t* physical_address) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(physical_address, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// READ MSG RESPONSE (Memory -> CPU)
+// Serializa mensaje READ RESPONSE
+t_paquete* serialize_msg_mem_cpu_read(uint32_t* value) {
+
+    t_paquete* paquete = crear_paquete(MSG_MEM_CPU__READ);
+    agregar_a_paquete(paquete, &value, sizeof(uint32_t));   
+
+    return paquete;
+}
+
+// Deserializa mensaje READ RESPONSE
+void deserialize_msg_mem_cpu_read(t_paquete* paquete, uint32_t* value) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(value, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// WRITE MSG (CPU -> Memory)
+// Serializa mensaje WRITE
+t_paquete* serialize_msg_cpu_mem_write(uint32_t* physical_address, uint32_t* value) {
+
+    t_paquete* paquete = crear_paquete(MSG_CPU_MEM__WRITE);
+    agregar_a_paquete(paquete, &physical_address, sizeof(uint32_t));
+    agregar_a_paquete(paquete, &value, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje WRITE
+void deserialize_msg_cpu_mem_write(t_paquete* paquete, uint32_t* physical_address, uint32_t* value) {
+    
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(physical_address, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(value, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// WRITE MSG RESPONSE (Memory -> CPU)
+// Serializa mensaje WRITE RESPONSE
+t_paquete* serialize_msg_mem_cpu_write() {
+
+    t_paquete* paquete = crear_paquete(MSG_MEM_CPU__WRITE);
+
+    return paquete;
+}
+
+
+// PAGE TABLE ACCESS 1st LEVEL (CPU -> Memory)
+// Serializa mensaje PAGE TABLE ACCESS 1st LEVEL
+t_paquete* serialize_msg_cpu_mem_page_access_1st(uint32_t* page_number) {
+
+    t_paquete* paquete = crear_paquete(MSG_CPU_MEM__PAGE_ACCESS_1ST);
+    agregar_a_paquete(paquete, &page_number, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje PAGE TABLE ACCESS 1st LEVEL
+void deserialize_msg_cpu_mem_page_access_1st(t_paquete* paquete, uint32_t* page_number) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(page_number, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// PAGE TABLE ACCESS 2nd LEVEL (CPU -> Memory)
+// Serializa mensaje PAGE TABLE ACCESS 2nd LEVEL
+t_paquete* serialize_msg_cpu_mem_page_access_2nd(uint32_t* page_number) {
+
+    t_paquete* paquete = crear_paquete(MSG_CPU_MEM__PAGE_ACCESS_2ND);
+    agregar_a_paquete(paquete, &page_number, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje PAGE TABLE ACCESS 2nd LEVEL
+void deserialize_msg_cpu_mem_page_access_2nd(t_paquete* paquete, uint32_t* page_number) {
+    
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(page_number, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+// PAGE TABLE ACCESS 1st LEVEL RESPONSE (Memory -> CPU)
+// Serializa mensaje PAGE TABLE ACCESS 1st LEVEL RESPONSE
+t_paquete* serialize_msg_mem_cpu_page_access_1st(uint32_t* page_number) {
+
+    t_paquete* paquete = crear_paquete(MSG_MEM_CPU__PAGE_ACCESS_1ST);
+    agregar_a_paquete(paquete, &page_number, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje PAGE TABLE ACCESS 1st LEVEL RESPONSE
+void deserialize_msg_mem_cpu_page_access_1st(t_paquete* paquete, uint32_t* page_number) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(page_number, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+// PAGE TABLE ACCESS 2nd LEVEL RESPONSE (Memory -> CPU)
+// Serializa mensaje PAGE TABLE ACCESS 2nd LEVEL RESPONSE
+t_paquete* serialize_msg_mem_cpu_page_access_2nd(uint32_t* frame_number) {
+
+    t_paquete* paquete = crear_paquete(MSG_MEM_CPU__PAGE_ACCESS_2ND);
+        agregar_a_paquete(paquete, &frame_number, sizeof(uint32_t));
+
+    return paquete;
+}
+
+// Deserializa mensaje PAGE TABLE ACCESS 2nd LEVEL RESPONSE
+void deserialize_msg_mem_cpu_page_access_2nd(t_paquete* paquete, uint32_t* frame_number) {
+
+    void* stream = paquete->buffer->stream;
+    stream += sizeof(uint32_t);
+    memcpy(frame_number, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+}
+
+
+/*
+ *      DESTROY & CLEAN-UP FUNCTIONS
+ */
+
 static void instructions_destroy(t_instruccion *self) {
     free(self);
 }

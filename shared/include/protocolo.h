@@ -24,7 +24,16 @@ typedef enum {
 	MSG_EXEC,					// EXECUTE message from KERNEL to CPU :: (PCB)
 	MSG_I_O,					// I/O message from CPU to KERNEL :: (PCB, I/O miliseconds)
 	MSG_EXIT,					// EXIT message from CPU to KERNEL :: (PCB)
-	DEBUG_OP_CODE				
+	MSG_CPU_MEM__HANDSHAKE,		// HANDSHAKE message from CPU to MEMORY :: ()
+	MSG_MEM_CPU__HANDSHAKE,		// HANDSHAKE response from MEMORY to CPU :: (Tamaño de página, Cantidad de entradas por tabla)
+	MSG_CPU_MEM__READ,			// READ message from CPU to MEMORY :: (Dirección física)
+	MSG_MEM_CPU__READ,			// READ response from MEMORY to CPU :: 
+	MSG_CPU_MEM__WRITE,			// WRITE message from CPU to MEMORY :: 
+	MSG_MEM_CPU__WRITE,			// WRITE response from MEMORY to CPU ::
+	MSG_CPU_MEM__PAGE_ACCESS_1ST,	// PAGE TABLE ACCESS 1st LEVEL message from CPU to MEMORY :: 
+	MSG_CPU_MEM__PAGE_ACCESS_2ND,	// PAGE TABLE ACCESS 2nd LEVEL message from CPU to MEMORY :: 
+	MSG_MEM_CPU__PAGE_ACCESS_1ST,	// PAGE TABLE ACCESS 1st LEVEL response from MEMORY to CPU :: 
+	MSG_MEM_CPU__PAGE_ACCESS_2ND	// PAGE TABLE ACCESS 2nd LEVEL response from MEMORY to CPU :: 
 } op_code;
 
 typedef struct {
@@ -72,30 +81,127 @@ void enviar_paquete(t_paquete* paquete, int socket_cliente);
 void eliminar_paquete(t_paquete* paquete);
 bool send_codigo_op(int fd, op_code cop);
 uint8_t recibir_header(t_paquete* paquete, int fd);
+void destroy_pcb(t_PCB* pcb);
 
-// EXEC MSG
-// Serializa mensaje EXEC (Kernel -> CPU)
+
+/* ################################ 
+		   CPU <-> KERNEL
+################################ */
+
+// EXEC MSG (Kernel -> CPU)
+// Serializa mensaje EXEC
 t_paquete* serialize_msg_exec(t_PCB* pcb);
-// Deserializa mensaje EXEC (Kernel -> CPU)
+// Deserializa mensaje EXEC
 void deserialize_msg_exec(t_paquete* paquete, t_PCB* pcb);
 
-// I/O MSG
-// Serializa mensaje I/O (CPU -> Kernel)
+// I/O MSG (CPU -> Kernel)
+// Serializa mensaje I/O
 t_paquete* serialize_msg_i_o(uint32_t msec, t_PCB* pcb); 
-// Deserializa mensaje I/O (CPU -> Kernel)
+// Deserializa mensaje I/O
 void deserialize_msg_i_o(t_paquete* paquete, uint32_t* msec, t_PCB* pcb);
 
-// EXIT MSG
-// Serializa mensaje EXIT (CPU -> Kernel)
+// EXIT MSG (CPU -> Kernel)
+// Serializa mensaje EXIT 
 t_paquete* serialize_msg_exit(t_PCB* pcb);
-// Deserializa mensaje EXIT (CPU -> Kernel)
+// Deserializa mensaje EXIT
 void deserialize_msg_exit(t_paquete* paquete, t_PCB* pcb);
 
+// INTERRUPT MSG (Kernel -> CPU)
+// Serializa mensaje INTERRUPT
 t_paquete* serialize_msg_interrupt();
+
+// INTERRUPT ACKNOWLEDGMENT MSG (CPU -> Kernel)
+// Serializa mensaje INTERRUPT ACK
 t_paquete* serialize_msg_interrupt_ack(t_PCB* pcb);
+// Deseriliza mensaje INTERRUPT ACK
 void deserialize_msg_interrupt_ack(t_paquete* paquete, t_PCB* pcb);
 
 
-void destroy_pcb(t_PCB* pcb);
+/* ################################ 
+		   CPU <-> MEMORY
+################################ */
+
+/*
+ *		HANDSHAKE MSG
+ */
+
+// CPU -> MEMORY
+
+// Serializa mensaje HANDSHAKE
+t_paquete* serialize_msg_cpu_mem_handshake();
+
+// MEMORY -> CPU
+
+// Serializa mensaje HANDSHAKE ACK
+t_paquete* serialize_msg_mem_cpu_handshake(uint32_t* page_size, uint32_t* input_table_qty);
+// Deserializa mensaje HANDSHAKE ACK
+void deserialize_msg_mem_cpu_handshake(t_paquete* paquete, uint32_t* page_size, uint32_t* input_table_qty);
+
+
+/*
+ *		READ MSG
+ */
+
+// CPU -> MEMORY
+
+// Serializa mensaje READ
+t_paquete* serialize_msg_cpu_mem_read(uint32_t* physical_address);
+// Deserializa mensaje READ
+void deserialize_msg_cpu_mem_read(t_paquete* paquete, uint32_t* physical_address);
+
+// MEMORY -> CPU
+
+// Serializa mensaje READ RESPONSE
+t_paquete* serialize_msg_mem_cpu_read(uint32_t* value);
+// Deserializa mensaje READ RESPONSE
+void deserialize_msg_mem_cpu_read(t_paquete* paquete, uint32_t* value);
+
+
+/*
+ *		WRITE MSG
+ */
+
+// CPU -> MEMORY
+
+// Serializa mensaje WRITE
+t_paquete* serialize_msg_cpu_mem_write(uint32_t* physical_address, uint32_t* value);
+// Deserializa mensaje WRITE
+void deserialize_msg_cpu_mem_write(t_paquete* paquete, uint32_t* physical_address, uint32_t* value);
+
+// MEMORY -> CPU
+
+// Serializa mensaje WRITE RESPONSE
+t_paquete* serialize_msg_mem_cpu_write();
+
+
+/*
+ *		MEMORY ACCESS MSG
+ */
+
+// CPU -> MEMORY
+// Serializa mensaje PAGE TABLE ACCESS 1st LEVEL
+t_paquete* serialize_msg_cpu_mem_page_access_1st(uint32_t* page_number);
+// Deserializa mensaje PAGE TABLE ACCESS 1st LEVEL
+void deserialize_msg_cpu_mem_page_access_1st(t_paquete* paquete, uint32_t* page_number);
+// Serializa mensaje PAGE TABLE ACCESS 2nd LEVEL
+t_paquete* serialize_msg_cpu_mem_page_access_2nd(uint32_t* page_number);
+// Deserializa mensaje PAGE TABLE ACCESS 2nd LEVEL
+void deserialize_msg_cpu_mem_page_access_2nd(t_paquete* paquete, uint32_t* page_number);
+
+// MEMORY -> CPU
+// PAGE TABLE ACCESS 1st LEVEL RESPONSE
+// Serializa mensaje PAGE TABLE ACCESS 1st LEVEL RESPONSE
+t_paquete* serialize_msg_mem_cpu_page_access_1st(uint32_t* page_number);
+// Deserializa mensaje PAGE TABLE ACCESS 1st LEVEL RESPONSE
+void deserialize_msg_mem_cpu_page_access_1st(t_paquete* paquete, uint32_t* page_number);
+// PAGE TABLE ACCESS 2nd LEVEL RESPONSE
+// Serializa mensaje PAGE TABLE ACCESS 2nd LEVEL RESPONSE
+t_paquete* serialize_msg_mem_cpu_page_access_2nd(uint32_t* frame_number);
+// Deserializa mensaje PAGE TABLE ACCESS 2nd LEVEL RESPONSE
+void deserialize_msg_mem_cpu_page_access_2nd(t_paquete* paquete, uint32_t* frame_number);
+
+/* ################################ 
+################################ */
+
 
 #endif
