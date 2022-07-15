@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 
+#include "global.h"
 #include "config.h"
 #include "memoria.h"
 

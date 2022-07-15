@@ -8,12 +8,15 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+#include "global.h"
 #include "config.h"
 #include "init.h"
 #include "comunicacion.h"
+#include "handler_cpu.h"
 
 // Shared
 #include "protocolo.h"
+#include "sockets.h"
 #include "shared_utils.h"
 
 #endif

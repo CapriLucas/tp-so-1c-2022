@@ -1,7 +1,10 @@
 #include "memoria.h"
 
-t_log* log_Memoria;
+// Config & Log
 t_config_Memoria* config_Memoria;
+t_log* log_Memoria;
+
+// Sockets
 int memoriaFd;
 int kernelFd;
 int cpuFd;
@@ -36,13 +39,16 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
-    // Esperar conexión de CPU
-    cpuFd = esperar_cliente (
-        log_Memoria, 
-        "CPU", 
-        memoriaFd
-    );
-    
+    // CPU Thread
+    pthread_t THREAD_CPU_LISTENER;
+    if(!pthread_create(&THREAD_CPU_LISTENER, NULL, (void*) handler_cpu, NULL))
+        pthread_detach(THREAD_CPU_LISTENER);
+    else {
+        log_error(log_Memoria, "ERROR CRITICO INICIANDO EL LISTENER DE CPU. ABORTANDO.");
+        return EXIT_FAILURE;
+    }
+
+    // KERNEL Thread
     pthread_t THREAD_KERNEL_LISTENER;
     if(!pthread_create(&THREAD_KERNEL_LISTENER, NULL, (void*) handler_kernel, NULL))
         pthread_detach(THREAD_KERNEL_LISTENER);
@@ -50,6 +56,7 @@ int main(){
         log_error(log_Memoria, "ERROR CRITICO INICIANDO EL LISTENER DEL KERNEL. ABORTANDO.");
         return EXIT_FAILURE;
     }
+    
     
     while(1);
     cerrar_programa();
