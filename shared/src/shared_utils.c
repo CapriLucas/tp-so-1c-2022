@@ -60,3 +60,24 @@ char* get_instruction_name(instruccion_cod cod) {
 		default:		return "";
 	}
 }
+
+// Return timestamp in microseconds
+uint64_t get_ms_timestamp() {
+
+    struct timespec tms;
+
+    if (clock_gettime(CLOCK_REALTIME,&tms)) {
+        return -1;
+    }
+    
+    // Microseconds = seconds multiplied with 1 million
+    uint64_t ms = tms.tv_sec * 1000000;      
+    // Add full microseconds
+    ms += tms.tv_nsec/1000;    
+    // Round up if necessary
+    if (tms.tv_nsec % 1000 >= 500) {
+        ++ms;
+    }
+
+    return ms;
+}
