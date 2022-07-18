@@ -28,4 +28,10 @@ typedef struct {
         PUERTO_ESCUCHA_INTERRUPT=8005
 */
 
+typedef struct {
+    uint32_t        page;   
+    uint32_t        frame;
+    struct timespec tms;
+} t_TLB;
+
 #endif

@@ -14,6 +14,7 @@
 #include "dispatch.h"
 #include "interrupt.h"
 #include "handler_memory.h"
+#include "tlb.h"
 
 // Shared
 #include "protocolo.h"

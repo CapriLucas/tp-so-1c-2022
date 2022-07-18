@@ -13,6 +13,7 @@
 // Global variables
 extern t_config_CPU* config_CPU;
 extern t_log* log_CPU;
+extern t_TLB tlb[];
 
 // File descriptors
 extern int memoriaFd;
