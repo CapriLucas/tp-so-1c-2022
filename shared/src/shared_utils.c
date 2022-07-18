@@ -81,3 +81,24 @@ uint64_t get_ms_timestamp() {
 
     return ms;
 }
+
+// Set timestamp
+int set_timestamp(struct timespec* tms) {
+
+    if (clock_gettime(CLOCK_REALTIME, (void*)tms)) {
+        return -1;
+    }
+    return 1;
+}
+
+// Compare timestamp and return true if a > b
+bool timestamp_cmp(struct timespec* a, struct timespec* b) {
+    
+    if (a->tv_sec > b->tv_sec)
+        return true;
+    else if (a->tv_sec == b->tv_sec) 
+        return a->tv_nsec > b->tv_nsec;
+    else
+        return false;
+
+}

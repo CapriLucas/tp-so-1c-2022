@@ -17,6 +17,12 @@ bool config_has_all_properties(t_config* , char**);
 char* leer_archivo_completo(char* path);
 char* get_instruction_name(instruccion_cod cod);
 instruccion_cod get_instruction_cod(char* string);
+
+// Get timestamp in microseconds
 uint64_t get_ms_timestamp();
+// Set timestamp
+int set_timestamp(struct timespec* tms);
+// Compare timestamp and return true if a > b
+bool timestamp_cmp(struct timespec* a, struct timespec* b);
 
 #endif
